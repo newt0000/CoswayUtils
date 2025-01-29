@@ -15,16 +15,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Vector;
-import org.bukkit.*;
-import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-import java.util.*;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -36,7 +26,6 @@ public final class CoswayUtil extends JavaPlugin {
     public void onEnable() {
         serverMessage(ColorKey("&aaw sheit here we go again...."));
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
-
 
     }
 
@@ -57,7 +46,7 @@ public final class CoswayUtil extends JavaPlugin {
     }
 
     public String prefix() {
-        return "[Cosway Utility] ";
+        return ColorKey("[&7Cosway Utility&r] ");
     }
     public void setScale(Player player, float value) {
         RayTraceResult result = player.getWorld().rayTraceEntities(
@@ -97,8 +86,7 @@ public final class CoswayUtil extends JavaPlugin {
     public void serverMessage(String msg) {
         getServer().broadcastMessage(prefix()+msg);
     }
-
-
+    //------------------------------------------------------------------------
     public class AnchorShield implements Listener {
         private final Map<Location, ArmorStand> activeAnchors = new HashMap<>();
         private final int RING_RADIUS = 15;
@@ -127,7 +115,7 @@ public final class CoswayUtil extends JavaPlugin {
         private boolean isMultiBlock(Location loc) {
             return loc.getBlock().getType() == Material.RESPAWN_ANCHOR &&
                     loc.clone().add(0, 1, 0).getBlock().getType() == Material.LIGHTNING_ROD &&
-                    loc.clone().add(0, 2, 0).getBlock().getType() == Material.NETHERITE_BLOCK; // Assuming Heavy Core
+                    loc.clone().add(0, 2, 0).getBlock().getType() == Material.HEAVY_CORE; // Assuming Heavy Core
         }
 
         private void manageAnchor(Location loc) {
@@ -216,5 +204,5 @@ public final class CoswayUtil extends JavaPlugin {
             }
         }
     }
-
 }
+
