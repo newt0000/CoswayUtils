@@ -140,7 +140,7 @@ public final class CoswayUtil extends JavaPlugin {
         }
 
         private ArmorStand spawnMarker(Location loc) {
-            ArmorStand marker = loc.getWorld().spawn(loc.add(0.5, 1, 0.5), ArmorStand.class);
+            ArmorStand marker = loc.getWorld().spawn(loc.add(0.5, 0, 0.5), ArmorStand.class);
             marker.setInvisible(true);
             marker.setInvulnerable(true);
             marker.setMarker(true);
@@ -213,9 +213,8 @@ public final class CoswayUtil extends JavaPlugin {
         @EventHandler
         public void onBlockPlace(BlockPlaceEvent event) {
             Location loc = event.getBlockPlaced().getLocation();
-            Bukkit.broadcastMessage("block placed");
             if (isMultiBlock(loc)) {
-                Bukkit.broadcastMessage("Multiblock made");
+                serverMessage("Multiblock made");
                 manageAnchor(loc);  // Start managing the anchor once the multi-block structure is assembled
             }
         }
