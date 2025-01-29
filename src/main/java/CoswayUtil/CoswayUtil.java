@@ -10,6 +10,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -26,7 +27,8 @@ public final class CoswayUtil extends JavaPlugin {
     public void onEnable() {
         serverMessage(ColorKey("&aaw sheit here we go again...."));
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
-
+        // Start the detection loop when the plugin is enabled
+        new AnchorShield().startDetectionLoop();
     }
 
     @Override
@@ -41,6 +43,9 @@ public final class CoswayUtil extends JavaPlugin {
             } else {
             setScale(player, Float.parseFloat(args[0]));
         }
+        }
+        if (cmd.getName().equalsIgnoreCase("scale") && sender instanceof Player) {
+            Player player = (Player) sender;
         }
         return true;
     }
@@ -139,6 +144,7 @@ public final class CoswayUtil extends JavaPlugin {
             marker.setInvisible(true);
             marker.setInvulnerable(true);
             marker.setMarker(true);
+            serverMessage("anchor shield created");
             return marker;
         }
 
@@ -203,6 +209,17 @@ public final class CoswayUtil extends JavaPlugin {
                 removeMarker(loc);
             }
         }
+
+        @EventHandler
+        public void onBlockPlace(BlockPlaceEvent event) {
+            Location loc = event.getBlockPlaced().getLocation();
+            Bukkit.broadcastMessage("block placed");
+            if (isMultiBlock(loc)) {
+                Bukkit.broadcastMessage("Multiblock made");
+                manageAnchor(loc);  // Start managing the anchor once the multi-block structure is assembled
+            }
+        }
     }
+
 }
 
