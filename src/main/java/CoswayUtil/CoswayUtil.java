@@ -1,10 +1,13 @@
 package CoswayUtil;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 public final class CoswayUtil extends JavaPlugin {
 
@@ -17,6 +20,17 @@ public final class CoswayUtil extends JavaPlugin {
     @Override
     public void onDisable() {
         serverMessage("im dead, im alive but im dead....");
+    }
+    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
+        if (cmd.getName().equalsIgnoreCase("scale") && sender instanceof Player) {
+        Player player = (Player) sender;
+        if (args.length < 1) {
+            return false;
+            } else {
+            setScale(player, Float.parseFloat(args[1]));
+        }
+        }
+        return true;
     }
 
     public String prefix() {
