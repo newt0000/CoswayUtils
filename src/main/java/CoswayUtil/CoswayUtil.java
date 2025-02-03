@@ -94,7 +94,7 @@ public final class CoswayUtil extends JavaPlugin {
         return sb.toString();
     }
     public void serverMessage(String msg) {
-        getServer().broadcastMessage(prefix()+msg);
+        getServer().broadcastMessage(prefix()+ColorKey(msg));
     }
     //------------------------------------------------------------------------
     public class AnchorShield implements Listener {
