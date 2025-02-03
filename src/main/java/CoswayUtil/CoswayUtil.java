@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+
+
 public final class CoswayUtil extends JavaPlugin {
 
     @Override
@@ -29,6 +31,7 @@ public final class CoswayUtil extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
         // Start the detection loop when the plugin is enabled
         new AnchorShield().startDetectionLoop();
+        //getCommand("clearanchors").setExecutor(new ClearAnchorsCommand(this, anchorShield));
     }
 
     @Override
@@ -44,8 +47,10 @@ public final class CoswayUtil extends JavaPlugin {
             setScale(player, Float.parseFloat(args[0]));
         }
         }
-        if (cmd.getName().equalsIgnoreCase("scale") && sender instanceof Player) {
+        if (cmd.getName().equalsIgnoreCase("clearanchors") && sender instanceof Player) {
             Player player = (Player) sender;
+            //AnchorShield.clearAnchors();
+            serverMessage("&6this does not work yet...");
         }
         return true;
     }
@@ -97,6 +102,16 @@ public final class CoswayUtil extends JavaPlugin {
         private final int RING_RADIUS = 15;
         private final int FUEL_DECREASE_TIME = 5 * 60 * 20; // 5 minutes in ticks
 
+        public void clearActiveAnchors() {
+            for (ArmorStand marker : activeAnchors.values()) {
+                if (marker != null && !marker.isDead()) {
+                    marker.remove(); // Remove the ArmorStand from the world
+                }
+            }
+            activeAnchors.clear(); // Clear the HashMap
+        }
+
+
         public void startDetectionLoop() {
             new BukkitRunnable() {
                 @Override
@@ -104,7 +119,7 @@ public final class CoswayUtil extends JavaPlugin {
                     for (World world : Bukkit.getWorlds()) {
                         for (Chunk chunk : world.getLoadedChunks()) {
                             for (BlockState state : chunk.getTileEntities()) {
-                                if (state.getBlock().getType() == Material.RESPAWN_ANCHOR) {
+                                if (state.getBlock().getType() == Material.HEAVY_CORE) {
                                     Location anchorLoc = state.getLocation();
                                     if (isMultiBlock(anchorLoc)) {
                                         manageAnchor(anchorLoc);
@@ -118,9 +133,9 @@ public final class CoswayUtil extends JavaPlugin {
         }
 
         private boolean isMultiBlock(Location loc) {
-            return loc.getBlock().getType() == Material.RESPAWN_ANCHOR &&
-                    loc.clone().add(0, 1, 0).getBlock().getType() == Material.LIGHTNING_ROD &&
-                    loc.clone().add(0, 2, 0).getBlock().getType() == Material.HEAVY_CORE; // Assuming Heavy Core
+            return loc.getBlock().getType() == Material.HEAVY_CORE &&
+                    loc.clone().add(0, -1, 0).getBlock().getType() == Material.LIGHTNING_ROD &&
+                    loc.clone().add(0, -2, 0).getBlock().getType() == Material.RESPAWN_ANCHOR; // Assuming Heavy Core
         }
 
         private void manageAnchor(Location loc) {
@@ -128,39 +143,51 @@ public final class CoswayUtil extends JavaPlugin {
                 ArmorStand marker = spawnMarker(loc);
                 activeAnchors.put(loc, marker);
                 startFuelTimer(loc);
-            }
-
-            int fuelLevel = loc.getBlock().getBlockData().getAsString().contains("charges=") ?
-                    Integer.parseInt(loc.getBlock().getBlockData().getAsString().split("charges=")[1].substring(0, 1)) : 0;
-
-            if (fuelLevel > 0) {
-                createParticleRing(loc);
-                killHostileMobs(loc);
+                startParticleEffect(loc);  // Start repeated particle and mob clearing
             }
         }
 
         private ArmorStand spawnMarker(Location loc) {
-            ArmorStand marker = loc.getWorld().spawn(loc.add(0.5, 0, 0.5), ArmorStand.class);
+            ArmorStand marker = loc.getWorld().spawn(loc.clone().add(0.5, 1, 0.5), ArmorStand.class);
             marker.setInvisible(true);
             marker.setInvulnerable(true);
             marker.setMarker(true);
-            serverMessage("anchor shield created");
+            serverMessage("Anchor shield created");
+            marker.getWorld().playEffect(marker.getLocation(),Effect.END_PORTAL_CREATED_IN_OVERWORLD,1);
             return marker;
         }
 
+        private void startParticleEffect(Location loc) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!activeAnchors.containsKey(loc)) {
+                        cancel();
+                        return;
+                    }
+                    createParticleRing(loc);
+                    killHostileMobs(loc);
+                }
+            }.runTaskTimer(CoswayUtil.this, 20, 20); // Run every second
+        }
+
         private void createParticleRing(Location loc) {
-            for (int i = 0; i < 360; i += 10) {
+            for (int i = 0; i < 360; i += 5) {
                 double radians = Math.toRadians(i);
                 double x = loc.getX() + RING_RADIUS * Math.cos(radians);
                 double z = loc.getZ() + RING_RADIUS * Math.sin(radians);
-                Location particleLoc = new Location(loc.getWorld(), x, loc.getY() + 1, z);
-                loc.getWorld().spawnParticle(Particle.CRIT, particleLoc, 1, new Particle.DustOptions(Color.RED, 1));
+                Location particleLoc = new Location(loc.getWorld(), x + 0.5, loc.getY() - 1, z + 0.5);
+                loc.getWorld().spawnParticle(Particle.DUST, particleLoc, 1, new Particle.DustOptions(Color.RED, 1));
             }
+            Location centered = new Location(loc.getWorld(),loc.getX() + 0.5, loc.getY(), loc.getZ() + 0.5);
+            loc.getWorld().spawnParticle(Particle.REVERSE_PORTAL, centered,10,0);
         }
 
         private void killHostileMobs(Location loc) {
             loc.getWorld().getEntitiesByClass(Monster.class).forEach(mob -> {
                 if (mob.getLocation().distance(loc) <= RING_RADIUS) {
+                    mob.getWorld().playEffect(mob.getLocation(),Effect.TRIAL_SPAWNER_DETECT_PLAYER_OMINOUS,1);
+                    mob.getWorld().playSound(mob.getLocation(),Sound.ENTITY_BREEZE_JUMP,10,0);
                     mob.remove();
                 }
             });
@@ -205,8 +232,16 @@ public final class CoswayUtil extends JavaPlugin {
         @EventHandler
         public void onBlockBreak(BlockBreakEvent event) {
             Location loc = event.getBlock().getLocation();
-            if (activeAnchors.containsKey(loc) || isMultiBlock(loc)) {
-                removeMarker(loc);
+
+            for (Location anchorLoc : activeAnchors.keySet()) {
+                if (isMultiBlock(anchorLoc) && (
+                        loc.equals(anchorLoc) ||
+                                loc.equals(anchorLoc.clone().add(0, -1, 0)) ||
+                                loc.equals(anchorLoc.clone().add(0, -2, 0))
+                )) {
+                    removeMarker(anchorLoc);
+                    return;
+                }
             }
         }
 
@@ -219,6 +254,7 @@ public final class CoswayUtil extends JavaPlugin {
             }
         }
     }
+
 
 }
 
