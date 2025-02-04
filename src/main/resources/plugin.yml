@@ -1,5 +1,5 @@
 name: CoswayUtil
-version: '1.6-BETA'
+version: '1.7-BETA'
 main: CoswayUtil.CoswayUtil
 description: "utility plugin for Cosway servers, a yescraft network server"
 api-version: '1.21'

@@ -17,6 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.NotNull;
+import org.bukkit.potion.PotionEffectType;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +34,29 @@ public final class CoswayUtil extends JavaPlugin {
         // Start the detection loop when the plugin is enabled
         new AnchorShield().startDetectionLoop();
         //getCommand("clearanchors").setExecutor(new ClearAnchorsCommand(this, anchorShield));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
+                        Location center = player.getLocation().add(0, 1, 0); // Center around player's head
+                        double radius = 1.5; // Radius of the sphere
+
+                        for (double theta = 0; theta < Math.PI * 2; theta += Math.PI / 8) { // Horizontal rotation
+                            for (double phi = 0; phi < Math.PI; phi += Math.PI / 8) { // Vertical rotation
+                                double x = radius * Math.sin(phi) * Math.cos(theta);
+                                double y = radius * Math.cos(phi);
+                                double z = radius * Math.sin(phi) * Math.sin(theta);
+
+                                Location particleLoc = center.clone().add(x, y, z);
+                                player.getWorld().spawnParticle(Particle.ENCHANT, particleLoc, 1, 0, 0, 0, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(this, 0, 10); // Runs every 10 ticks (0.5 seconds)
+
     }
 
     @Override
@@ -99,7 +124,7 @@ public final class CoswayUtil extends JavaPlugin {
     //------------------------------------------------------------------------
     public class AnchorShield implements Listener {
         private final Map<Location, ArmorStand> activeAnchors = new HashMap<>();
-        private final int RING_RADIUS = 15;
+        private final int RING_RADIUS = 25;
         private final int FUEL_DECREASE_TIME = 5 * 60 * 20; // 5 minutes in ticks
 
         public void clearActiveAnchors() {
@@ -153,7 +178,10 @@ public final class CoswayUtil extends JavaPlugin {
             marker.setInvulnerable(true);
             marker.setMarker(true);
             serverMessage("Anchor shield created");
-            marker.getWorld().playEffect(marker.getLocation(),Effect.END_PORTAL_CREATED_IN_OVERWORLD,1);
+            marker.getWorld().playEffect(marker.getLocation().subtract(0,2,0),Effect.TRIAL_SPAWNER_BECOME_OMINOUS,1);
+            marker.getWorld().playEffect(marker.getLocation().subtract(0,2,0),Effect.SMASH_ATTACK,1);
+            marker.getWorld().playSound(marker.getLocation(),Sound.BLOCK_END_PORTAL_SPAWN,100,0);
+            marker.getWorld().playEffect(marker.getLocation().subtract(0,2,0),Effect.ELECTRIC_SPARK,1);
             return marker;
         }
 
@@ -168,19 +196,21 @@ public final class CoswayUtil extends JavaPlugin {
                     createParticleRing(loc);
                     killHostileMobs(loc);
                 }
-            }.runTaskTimer(CoswayUtil.this, 20, 20); // Run every second
+            }.runTaskTimer(CoswayUtil.this, 20, 10); // Run every second
         }
 
         private void createParticleRing(Location loc) {
-            for (int i = 0; i < 360; i += 5) {
+            for (int i = 0; i < 360; i += 1) {
                 double radians = Math.toRadians(i);
                 double x = loc.getX() + RING_RADIUS * Math.cos(radians);
                 double z = loc.getZ() + RING_RADIUS * Math.sin(radians);
                 Location particleLoc = new Location(loc.getWorld(), x + 0.5, loc.getY() - 1, z + 0.5);
-                loc.getWorld().spawnParticle(Particle.DUST, particleLoc, 1, new Particle.DustOptions(Color.RED, 1));
+                //loc.getWorld().spawnParticle(Particle.DUST, particleLoc, 1, new Particle.DustOptions(Color.LIME, 1));
+                loc.getWorld().spawnParticle(Particle.REVERSE_PORTAL, particleLoc, 3, 0, 1, 0, 0);
+
             }
             Location centered = new Location(loc.getWorld(),loc.getX() + 0.5, loc.getY(), loc.getZ() + 0.5);
-            loc.getWorld().spawnParticle(Particle.REVERSE_PORTAL, centered,10,0);
+            loc.getWorld().spawnParticle(Particle.PORTAL, centered,10);
         }
 
         private void killHostileMobs(Location loc) {
