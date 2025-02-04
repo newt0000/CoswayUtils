@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.potion.PotionEffectType;
-
+import org.bukkit.block.data.type.RespawnAnchor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,13 +49,13 @@ public final class CoswayUtil extends JavaPlugin {
                                 double z = radius * Math.sin(phi) * Math.sin(theta);
 
                                 Location particleLoc = center.clone().add(x, y, z);
-                                player.getWorld().spawnParticle(Particle.ENCHANT, particleLoc, 1, 0, 0, 0, 0);
+                                player.getWorld().spawnParticle(Particle.DUST, particleLoc, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.AQUA, 0.5F));
                             }
                         }
                     }
                 }
             }
-        }.runTaskTimer(this, 0, 10); // Runs every 10 ticks (0.5 seconds)
+        }.runTaskTimer(this, 0, 2); // Runs every 10 ticks (0.5 seconds)
 
     }
 
@@ -125,12 +125,13 @@ public final class CoswayUtil extends JavaPlugin {
     public class AnchorShield implements Listener {
         private final Map<Location, ArmorStand> activeAnchors = new HashMap<>();
         private final int RING_RADIUS = 25;
-        private final int FUEL_DECREASE_TIME = 5 * 60 * 20; // 5 minutes in ticks
+        private final int FUEL_DECREASE_TIME = 1 * 60 * 20; // 5 minutes in ticks
 
         public void clearActiveAnchors() {
             for (ArmorStand marker : activeAnchors.values()) {
                 if (marker != null && !marker.isDead()) {
                     marker.remove(); // Remove the ArmorStand from the world
+                    serverMessage("removed marker");
                 }
             }
             activeAnchors.clear(); // Clear the HashMap
@@ -191,6 +192,9 @@ public final class CoswayUtil extends JavaPlugin {
                 public void run() {
                     if (!activeAnchors.containsKey(loc)) {
                         cancel();
+                        serverMessage("anchors active: " + activeAnchors.toString());
+                        serverMessage("active loc: "+loc);
+                        serverMessage("cancel runnable initiated 1");
                         return;
                     }
                     createParticleRing(loc);
@@ -228,25 +232,35 @@ public final class CoswayUtil extends JavaPlugin {
                 @Override
                 public void run() {
                     if (!activeAnchors.containsKey(loc)) {
+                        serverMessage("anchor mapping did not match, removed anchor: "+loc);
                         cancel();
+                        serverMessage("cancel runnable initiated 2");
                         return;
                     }
 
-                    Block block = loc.getBlock();
+                    Block block = loc.clone().subtract(0,2,0).getBlock();
+                    RespawnAnchor anchorData = (RespawnAnchor) block.getBlockData();
                     if (block.getType() != Material.RESPAWN_ANCHOR) {
+                        serverMessage(String.valueOf(block.getType()));
                         removeMarker(loc);
                         cancel();
+                        serverMessage("cancel runnable initiated 3");
                         return;
                     }
 
-                    int fuelLevel = block.getBlockData().getAsString().contains("charges=") ?
-                            Integer.parseInt(block.getBlockData().getAsString().split("charges=")[1].substring(0, 1)) : 0;
+                    int fuelLevel = anchorData.getCharges();
 
                     if (fuelLevel > 0) {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "data merge block " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " {Charges:" + (fuelLevel - 1) + "}");
+                        anchorData.setCharges(anchorData.getCharges() - 1);
+                        block.setBlockData(anchorData); // Apply the new data
+                        loc.getBlock().getWorld().playSound(loc,Sound.BLOCK_BEACON_DEACTIVATE,10,0);
+                        loc.getBlock().getWorld().playEffect(loc,Effect.TRIAL_SPAWNER_DETECT_PLAYER,1);
+                        serverMessage("depleted anchor charge");
                     } else {
                         removeMarker(loc);
+                        serverMessage("removed anchor shield for no fuel");
                         cancel();
+                        serverMessage("cancel runnable initiated 4");
                     }
                 }
             }.runTaskTimer(CoswayUtil.this, FUEL_DECREASE_TIME, FUEL_DECREASE_TIME);
@@ -256,6 +270,7 @@ public final class CoswayUtil extends JavaPlugin {
             if (activeAnchors.containsKey(loc)) {
                 activeAnchors.get(loc).remove();
                 activeAnchors.remove(loc);
+                serverMessage("force removed shield mapping");
             }
         }
 
