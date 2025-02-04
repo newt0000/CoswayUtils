@@ -125,7 +125,7 @@ public final class CoswayUtil extends JavaPlugin {
     public class AnchorShield implements Listener {
         private final Map<Location, ArmorStand> activeAnchors = new HashMap<>();
         private final int RING_RADIUS = 25;
-        private final int FUEL_DECREASE_TIME = 5 * 60 * 20; // 5 minutes in ticks
+        private final int FUEL_DECREASE_TIME = 10 * 60 * 20; // 5 minutes in ticks
         boolean debug = false;
         public void debugMessage(String msg) {
             if(debug) {
