@@ -16,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.block.data.type.RespawnAnchor;
@@ -72,16 +73,25 @@ public final class CoswayUtil extends JavaPlugin {
             setScale(player, Float.parseFloat(args[0]));
         }
         }
-        if (cmd.getName().equalsIgnoreCase("clearanchors") && sender instanceof Player) {
+        if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player) {
             Player player = (Player) sender;
-            //AnchorShield.clearAnchors();
-            serverMessage("&6this does not work yet...");
+            Player Target = getNearestPlayer(player,10);
+            if(Target == null) {
+                returnMsg(player,"&cNo players in radius");
+            } else {
+                throwEntityAway(Target, player.getLocation(), 6);
+                returnMsg(Target,"&cYou were thrown by "+player.getName());
+                returnMsg(player,"&aYou threw "+Target.getName());
+            }
         }
         return true;
     }
 
     public String prefix() {
         return ColorKey("[&7Cosway Utility&r] ");
+    }
+    public void returnMsg(Player p,String msg) {
+        p.sendMessage(ColorKey(msg));
     }
     public void setScale(Player player, float value) {
         RayTraceResult result = player.getWorld().rayTraceEntities(
@@ -121,6 +131,32 @@ public final class CoswayUtil extends JavaPlugin {
     public void serverMessage(String msg) {
         getServer().broadcastMessage(prefix()+ColorKey(msg));
     }
+    private void throwEntityAway(Entity entity, Location source, double power) {
+        if (entity == null || source == null) return;
+
+        Location entityLoc = entity.getLocation();
+        Vector knockbackDirection = entityLoc.toVector().subtract(source.toVector()).normalize();
+
+        // Apply velocity in the opposite direction
+        entity.setVelocity(knockbackDirection.multiply(power).setY(1));
+    }
+    private Player getNearestPlayer(Player sender, double radius) {
+        Location senderLoc = sender.getLocation();
+        Player nearestPlayer = null;
+        double closestDistance = radius;
+
+        for (Player player : sender.getWorld().getPlayers()) {
+            if (player.equals(sender)) continue; // Skip the sender
+
+            double distance = senderLoc.distance(player.getLocation());
+            if (distance <= radius && distance < closestDistance) {
+                closestDistance = distance;
+                nearestPlayer = player;
+            }
+        }
+        return nearestPlayer; // Returns null if no player is found
+    }
+
     //------------------------------------------------------------------------
     public class AnchorShield implements Listener {
         private final Map<Location, ArmorStand> activeAnchors = new HashMap<>();
@@ -227,7 +263,16 @@ public final class CoswayUtil extends JavaPlugin {
                 if (mob.getLocation().distance(loc) <= RING_RADIUS) {
                     mob.getWorld().playEffect(mob.getLocation(),Effect.TRIAL_SPAWNER_DETECT_PLAYER_OMINOUS,1);
                     mob.getWorld().playSound(mob.getLocation(),Sound.ENTITY_BREEZE_JUMP,10,0);
-                    mob.remove();
+                    throwEntityAway(mob,loc,6);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (mob.getLocation().distance(loc) <= RING_RADIUS) {
+                                mob.remove();
+                            }
+                        }
+                    }.runTaskLater(CoswayUtil.this,30);
+
                 }
             });
         }

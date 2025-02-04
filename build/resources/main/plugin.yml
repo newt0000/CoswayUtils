@@ -9,7 +9,7 @@ commands:
   scale:
     permission: cosway.admin
     usage: "/scale <float>"
-  clearanchors:
-    description: Clears all active anchor shields
-    usage: /clearanchors
-    permission: cosway.clearanchors
+  throw:
+    description: Throws nearest player in a 10 block radius of you
+    usage: "/throw"
+    permission: cosway.throw
