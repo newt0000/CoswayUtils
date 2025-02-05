@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -139,6 +140,10 @@ public final class CoswayUtil extends JavaPlugin {
 
         // Apply velocity in the opposite direction
         entity.setVelocity(knockbackDirection.multiply(power).setY(1));
+    }
+    @EventHandler
+    public void ev(PlayerChangedWorldEvent event) {
+
     }
     private Player getNearestPlayer(Player sender, double radius) {
         Location senderLoc = sender.getLocation();
