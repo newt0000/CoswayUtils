@@ -140,8 +140,9 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         if (entity == null || source == null) return;
 
         Location entityLoc = entity.getLocation();
-        entity.getWorld().playEffect(entity.getLocation(),Effect.BAT_TAKEOFF,1);
-        entity.getWorld().playSound(entity.getLocation(),Sound.ENTITY_BAT_TAKEOFF,10,1);
+        entity.getWorld().playEffect(entity.getLocation(),Effect.TRIAL_SPAWNER_DETECT_PLAYER_OMINOUS,1);
+        entity.getWorld().playSound(entity.getLocation(),Sound.ENTITY_BREEZE_JUMP,10,0);
+
         Vector knockbackDirection = entityLoc.toVector().subtract(source.toVector()).normalize();
 
         // Apply velocity in the opposite direction
