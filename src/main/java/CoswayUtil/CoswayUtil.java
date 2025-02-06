@@ -111,7 +111,14 @@ public final class CoswayUtil extends JavaPlugin {
 
             player.sendMessage("§aSet scale of " + entity.getName() + " to " + value);
         } else {
-            player.sendMessage("§cNot Looking at any entity!");
+            player.sendMessage("§cNot Looking at any entity! setting for nearest player in radius!");
+            Entity entity = getNearestPlayer(player,4);
+            String entityUUID = entity.getUniqueId().toString();
+
+            String command = "attribute " + entityUUID + " minecraft:scale base set " + value;
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+
+            player.sendMessage("§aSet scale of " + entity.getName() + " to " + value);
         }
     }
     public String ColorKey(String t) {
@@ -136,6 +143,8 @@ public final class CoswayUtil extends JavaPlugin {
         if (entity == null || source == null) return;
 
         Location entityLoc = entity.getLocation();
+        entity.getWorld().playEffect(entity.getLocation(),Effect.BAT_TAKEOFF,1);
+        entity.getWorld().playSound(entity.getLocation(),Sound.ENTITY_BAT_TAKEOFF,10,1);
         Vector knockbackDirection = entityLoc.toVector().subtract(source.toVector()).normalize();
 
         // Apply velocity in the opposite direction
