@@ -333,6 +333,7 @@ public final class CoswayUtil extends JavaPlugin {
         }
 
         private void removeMarker(Location loc) {
+            Location newloc = loc.clone().add(0,1,0);
             if (activeAnchors.containsKey(loc)) {
                 activeAnchors.get(loc).remove();
                 activeAnchors.remove(loc);
