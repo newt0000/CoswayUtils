@@ -27,7 +27,7 @@ import java.util.Map;
 
 
 
-public final class CoswayUtil extends JavaPlugin {
+public final class CoswayUtil extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
@@ -35,7 +35,6 @@ public final class CoswayUtil extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
         // Start the detection loop when the plugin is enabled
         new AnchorShield().startDetectionLoop();
-        //getCommand("clearanchors").setExecutor(new ClearAnchorsCommand(this, anchorShield));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -65,22 +64,20 @@ public final class CoswayUtil extends JavaPlugin {
     public void onDisable() {
         serverMessage(ColorKey("&cim dead, im alive but im dead...."));
     }
-    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("scale") && sender instanceof Player) {
-        Player player = (Player) sender;
-        if (args.length < 1) {
+    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String @NotNull [] args) {
+        if (cmd.getName().equalsIgnoreCase("scale") && sender instanceof Player player) {
+            if (args.length < 1) {
             return false;
             } else {
             setScale(player, Float.parseFloat(args[0]));
         }
         }
-        if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player) {
-            Player player = (Player) sender;
+        if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player player) {
             Player Target = getNearestPlayer(player,10);
             if(Target == null) {
                 returnMsg(player,"&cNo players in radius");
             } else {
-                throwEntityAway(Target, player.getLocation(), 6);
+                throwEntityAway(Target, player.getLocation(), 8);
                 returnMsg(Target,"&cYou were thrown by "+player.getName());
                 returnMsg(player,"&aYou threw "+Target.getName());
             }
@@ -99,7 +96,7 @@ public final class CoswayUtil extends JavaPlugin {
                 player.getEyeLocation(),
                 player.getEyeLocation().getDirection(),
                 10,
-                entity -> entity instanceof Player == false // Ignore the player
+                entity -> !(entity instanceof Player) // Ignore the player
         );
 
         if (result != null && result.getHitEntity() != null) {
@@ -175,7 +172,6 @@ public final class CoswayUtil extends JavaPlugin {
     public class AnchorShield implements Listener {
         private final Map<Location, ArmorStand> activeAnchors = new HashMap<>();
         private final int RING_RADIUS = 25;
-        private final int FUEL_DECREASE_TIME = 10 * 60 * 20; // 5 minutes in ticks
         boolean debug = false;
         public void debugMessage(String msg) {
             if(debug) {
@@ -292,6 +288,8 @@ public final class CoswayUtil extends JavaPlugin {
         }
 
         private void startFuelTimer(Location loc) {
+            // 5 minutes in ticks
+            int FUEL_DECREASE_TIME = 10 * 60 * 20;
             new BukkitRunnable() {
                 @Override
                 public void run() {
