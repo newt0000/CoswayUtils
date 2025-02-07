@@ -70,15 +70,20 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         // Register TotemShield
         new TotemShield(this);
         // Register the ShadowStep listener
+        new MobLevitationWand(this);
         getServer().getPluginManager().registerEvents(new ShadowStep(this), this);
-        // Register command
-        this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
+        //register levitation wand
+        Bukkit.getPluginManager().registerEvents(new MobLevitationWand(this), this);
         // Register the PhantomDodge listener
         getServer().getPluginManager().registerEvents(new PhantomDodge(this), this);
         // Register the WitherContract listener
         getServer().getPluginManager().registerEvents(new WitherContract(this), this);
-        Bukkit.getPluginManager().registerEvents(new MobLevitationWand(this), this);
+        // Register commands
+        this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
         this.getCommand("getwand").setExecutor(new GiveWandCommand());
+
+
+
     }
 
     @Override

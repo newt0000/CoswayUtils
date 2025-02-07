@@ -4,6 +4,8 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,7 +17,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class MobLevitationWand implements Listener {
-    private final NamespacedKey wandKey = new NamespacedKey("your_plugin", "levitation_wand");
+    private final NamespacedKey wandKey = new NamespacedKey("coswayutil", "levitation_wand");
     private final HashMap<UUID, Entity> levitatedMobs = new HashMap<>();
     private final CoswayUtil plugin;
 
@@ -53,6 +55,7 @@ public class MobLevitationWand implements Listener {
         }
     }
 
+
     private boolean isLevitationWand(ItemStack item) {
         if (item == null || item.getType() != Material.STICK || !item.hasItemMeta()) return false;
         ItemMeta meta = item.getItemMeta();
@@ -78,6 +81,18 @@ public class MobLevitationWand implements Listener {
 
                 Vector direction = player.getLocation().getDirection().normalize().multiply(5);
                 Location newLocation = player.getLocation().add(direction);
+                World world = player.getWorld();
+
+                // Ensure the mob is not placed inside a solid block
+                while (newLocation.getBlock().getType().isSolid()) {
+                    newLocation.add(0, 1, 0); // Move up until a free space is found
+                }
+
+                // Ensure the mob is not underground
+                int highestY = world.getHighestBlockYAt(newLocation);
+                if (newLocation.getY() < highestY) {
+                    newLocation.setY(highestY + 1); // Adjust to be above ground
+                }
 
                 entity.teleport(newLocation);
 
@@ -92,6 +107,7 @@ public class MobLevitationWand implements Listener {
         }.runTaskTimer(plugin, 0L, 2L);
     }
 
+
     private void releaseMob(Player player) {
         Entity entity = levitatedMobs.remove(player.getUniqueId());
         if (entity != null) {
@@ -104,7 +120,7 @@ public class MobLevitationWand implements Listener {
         ItemStack wand = new ItemStack(Material.STICK);
         ItemMeta meta = wand.getItemMeta();
         meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Levitation Wand");
-        meta.getPersistentDataContainer().set(new NamespacedKey("CoswayUtil", "levitation_wand"), PersistentDataType.STRING, "true");
+        meta.getPersistentDataContainer().set(new NamespacedKey("coswayutil", "levitation_wand"), PersistentDataType.STRING, "true");
         wand.setItemMeta(meta);
         return wand;
     }
