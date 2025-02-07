@@ -1,5 +1,6 @@
 package CoswayUtil;
 
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.LivingEntity;
@@ -9,10 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.World;
-import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +29,11 @@ public class WitherContract implements Listener {
     public void onWitherSkullPlace(BlockPlaceEvent event) {
         // Check if the block placed is Wither Skull on Soul Sand
         Block block = event.getBlockPlaced();
-        if (block.getType() == Material.SOUL_SAND && event.getItemInHand().getType() == Material.WITHER_SKELETON_SKULL) {
+        Block blockBellow = block.getLocation().clone().subtract(0,1,0).getBlock();
+        if (blockBellow.getType() == Material.SOUL_SAND && event.getItemInHand().getType() == Material.WITHER_SKELETON_SKULL) {
             Player player = event.getPlayer();
             World world = block.getWorld();
+            plugin.serverMessage("&6Wither Contract has been Activated!");
 
             // Find a random hostile mob within 30 blocks
             LivingEntity target = findRandomHostileEntity(block.getLocation(), 30);
@@ -73,12 +73,15 @@ public class WitherContract implements Listener {
             @Override
             public void run() {
                 if (target.isDead()) {
+                    target.getWorld().playEffect(target.getLocation().clone().subtract(0.5,0,0.5),Effect.END_GATEWAY_SPAWN,1);
                     cancel();  // Stop task if the mob is dead
                 } else {
+                    target.getWorld().playEffect(target.getLocation().clone().subtract(0,0,0),Effect.TRIAL_SPAWNER_BECOME_OMINOUS,1);
+                    target.getWorld().spawnParticle(Particle.DUST, target.getLocation().clone().subtract(0,-2,0), 1, new Particle.DustOptions(Color.RED, 2));
                     target.damage(1);  // Deal 1 damage per tick (20 ticks = 1 second)
                 }
             }
-        }.runTaskTimer(plugin, 0, 20);  // Run every 20 ticks (1 second)
+        }.runTaskTimer(plugin, 0, 10);  // Run every 10 ticks (0.5 second)
 
         // Listen for the mob's death and apply curse to nearby mobs
         target.getServer().getPluginManager().registerEvents(new Listener() {
