@@ -37,11 +37,13 @@ public class GravityGauntlet implements Listener {
                 event.setCancelled(true);
 
                 // Cooldown check
-                if (cooldowns.containsKey(player.getUniqueId())) {
-                    long timeLeft = (cooldowns.get(player.getUniqueId()) + COOLDOWN_TIME) - System.currentTimeMillis();
-                    if (timeLeft > 0) {
-                        player.sendMessage(ColorKey("&cThe Gravity Gauntlet is on cooldown for " + (timeLeft / 1000) + "s!"));
-                        return;
+                if(player.getGameMode() != GameMode.CREATIVE) {
+                    if (cooldowns.containsKey(player.getUniqueId())) {
+                        long timeLeft = (cooldowns.get(player.getUniqueId()) + COOLDOWN_TIME) - System.currentTimeMillis();
+                        if (timeLeft > 0) {
+                            player.sendMessage(ColorKey("&cThe Gravity Gauntlet is on cooldown for " + (timeLeft / 1000) + "s!"));
+                            return;
+                        }
                     }
                 }
                 cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
