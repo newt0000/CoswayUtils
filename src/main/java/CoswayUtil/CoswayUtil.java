@@ -57,7 +57,8 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 0, 2); // Runs every 10 ticks (0.5 seconds)
-
+        // Register Gravity Gauntlet
+        new GravityGauntlet(this);
     }
 
     @Override
