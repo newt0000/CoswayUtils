@@ -69,6 +69,8 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
         // Register the PhantomDodge listener
         getServer().getPluginManager().registerEvents(new PhantomDodge(this), this);
+        // Register the WitherContract listener
+        getServer().getPluginManager().registerEvents(new WitherContract(this), this);
 
     }
 
