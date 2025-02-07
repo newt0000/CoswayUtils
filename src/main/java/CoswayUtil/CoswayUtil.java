@@ -21,6 +21,8 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.block.data.type.RespawnAnchor;
+import CoswayUtil.GravityGauntletCommand;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +61,8 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         }.runTaskTimer(this, 0, 2); // Runs every 10 ticks (0.5 seconds)
         // Register Gravity Gauntlet
         new GravityGauntlet(this);
+        // Register command
+        this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
     }
 
     @Override
