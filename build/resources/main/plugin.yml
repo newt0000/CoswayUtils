@@ -7,7 +7,7 @@ author: "Newt_00"
 website: "ycs.Newt-Tech.com"
 commands:
   scale:
-    permission: cosway.admin
+    permission: cosway.scale
     usage: "/scale <float>"
   throw:
     description: Throws nearest player in a 10 block radius of you
@@ -16,3 +16,4 @@ commands:
   gravitygauntlet:
     description: "Gives the player a Gravity Gauntlet"
     usage: "/gravitygauntlet"
+    permission: CoswayUtil.GravityGauntlet
