@@ -18,7 +18,7 @@ import java.util.UUID;
 public class GravityGauntlet implements Listener {
     private final CoswayUtil plugin; // Reference to the main plugin
     private final Map<UUID, Long> cooldowns = new HashMap<>();
-    private static final long COOLDOWN_TIME = 5 * 1000; // 5 seconds in milliseconds
+    private static final long COOLDOWN_TIME = 10 * 1000; // 5 seconds in milliseconds
 
     public GravityGauntlet(CoswayUtil plugin) {
         this.plugin = plugin;

@@ -13,7 +13,6 @@ commands:
     description: Throws nearest player in a 10 block radius of you
     usage: "/throw"
     permission: cosway.throw
-  commands:
-    gravitygauntlet:
-      description: "Gives the player a Gravity Gauntlet"
-      usage: "/gravitygauntlet"
+  gravitygauntlet:
+    description: "Gives the player a Gravity Gauntlet"
+    usage: "/gravitygauntlet"
