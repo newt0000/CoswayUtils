@@ -9,9 +9,15 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Monster;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -283,6 +289,61 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             loc.getWorld().spawnParticle(Particle.PORTAL, centered,10);
         }
 
+        @EventHandler
+        public void onAnchorExplosion(BlockExplodeEvent event) {
+            Block block = event.getBlock();
+
+            // Check if the explosion is caused by a Respawn Anchor in a non-Nether world
+            if (block.getType() == Material.RESPAWN_ANCHOR && block.getWorld().getEnvironment() != World.Environment.NETHER) {
+                event.setCancelled(true); // Cancel the explosion
+            }
+        }
+
+        @EventHandler
+        public void onAnchorEntityExplosion(EntityExplodeEvent event) {
+            Block block = event.getLocation().getBlock();
+
+            // Check if the explosion is caused by a Respawn Anchor in a non-Nether world
+            if (block.getType() == Material.RESPAWN_ANCHOR && block.getWorld().getEnvironment() != World.Environment.NETHER) {
+                event.setCancelled(true); // Cancel the explosion
+            }
+        }
+        @EventHandler
+        public void onRespawnAnchorInteract(PlayerInteractEvent event) {
+            // Check if the player right-clicked a block
+            if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                Block block = event.getClickedBlock();
+                Player player = event.getPlayer();
+                ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+                if (block != null && block.getType() == Material.RESPAWN_ANCHOR) {
+                    World world = block.getWorld();
+
+                    // Check if the world is not the Nether
+                    if (world.getEnvironment() != World.Environment.NETHER) {
+                        // Get the Respawn Anchor's data
+                        RespawnAnchor anchor = (RespawnAnchor) block.getBlockData();
+
+                        // Check if the anchor is fully charged (4 charges)
+                        if (anchor.getCharges() >= anchor.getMaximumCharges()) {
+                            event.setCancelled(true);
+                            player.sendMessage("This Respawn Anchor is fully charged and cannot be used here.");
+                            return;
+                        }
+
+                        // Allow charging if holding Glowstone
+                        if (itemInHand.getType() == Material.GLOWSTONE) {
+                            // Let the charging happen naturally
+                            player.sendMessage("Charging Respawn Anchor...");
+                        } else {
+                            // Cancel any other interaction (like right-clicking with an empty hand)
+                            event.setCancelled(true);
+                            player.sendMessage("Respawn Anchors can only be charged with Glowstone outside the Nether.");
+                        }
+                    }
+                }
+            }
+        }
         private void killHostileMobs(Location loc) {
             loc.getWorld().getEntitiesByClass(Monster.class).forEach(mob -> {
                 if (mob.getLocation().distance(loc) <= RING_RADIUS) {
