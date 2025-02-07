@@ -61,8 +61,15 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         }.runTaskTimer(this, 0, 2); // Runs every 10 ticks (0.5 seconds)
         // Register Gravity Gauntlet
         new GravityGauntlet(this);
+        // Register TotemShield
+        new TotemShield(this);
+        // Register the ShadowStep listener
+        getServer().getPluginManager().registerEvents(new ShadowStep(this), this);
         // Register command
         this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
+        // Register the PhantomDodge listener
+        getServer().getPluginManager().registerEvents(new PhantomDodge(this), this);
+
     }
 
     @Override
