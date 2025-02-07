@@ -77,7 +77,8 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new PhantomDodge(this), this);
         // Register the WitherContract listener
         getServer().getPluginManager().registerEvents(new WitherContract(this), this);
-
+        Bukkit.getPluginManager().registerEvents(new MobLevitationWand(this), this);
+        this.getCommand("getwand").setExecutor(new GiveWandCommand());
     }
 
     @Override
