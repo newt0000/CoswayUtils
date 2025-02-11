@@ -81,6 +81,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         // Register commands
         this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
         this.getCommand("getwand").setExecutor(new GiveWandCommand());
+        getServer().getPluginManager().registerEvents(new LaunchStick(this), this);
 
 
 
@@ -97,6 +98,9 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             } else {
             setScale(player, Float.parseFloat(args[0]));
         }
+        }
+        if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player player) {
+            player.getInventory().addItem(LaunchStick.createLaunchStick());
         }
         if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player player) {
             Player Target = getNearestPlayer(player,10);
@@ -414,6 +418,8 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
 
         private void removeMarker(Location loc) {
             Location newloc = loc.clone().add(0,1,0);
+            loc.getBlock().getWorld().playSound(loc,Sound.ITEM_TOTEM_USE,10,0);
+            loc.getBlock().getWorld().playEffect(loc,Effect.ENDER_DRAGON_DEATH,1);
             if (activeAnchors.containsKey(loc)) {
                 activeAnchors.get(loc).remove();
                 activeAnchors.remove(loc);
