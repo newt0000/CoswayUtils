@@ -99,7 +99,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             setScale(player, Float.parseFloat(args[0]));
         }
         }
-        if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player player) {
+        if (cmd.getName().equalsIgnoreCase("launchstick") && sender instanceof Player player) {
             player.getInventory().addItem(LaunchStick.createLaunchStick());
         }
         if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player player) {

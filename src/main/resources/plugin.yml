@@ -21,3 +21,7 @@ commands:
     description: "Gives player a levitation wand"
     usage: "/getwand"
     permission: CoswayUtil.wand
+  launchstick:
+    description: give player a stick to use for launching themselves
+    usage: /launchstick
+    permission: CoswayUtil.launchStick
