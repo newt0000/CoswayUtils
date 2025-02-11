@@ -13,6 +13,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -57,7 +58,7 @@ public class MobLevitationWand implements Listener {
 
 
     private boolean isLevitationWand(ItemStack item) {
-        if (item == null || item.getType() != Material.STICK || !item.hasItemMeta()) return false;
+        if (item == null || item.getType() != Material.CARROT_ON_A_STICK || !item.hasItemMeta()) return false;
         ItemMeta meta = item.getItemMeta();
         return meta.getPersistentDataContainer().has(wandKey, PersistentDataType.STRING);
     }
@@ -117,9 +118,10 @@ public class MobLevitationWand implements Listener {
     }
 
     public static ItemStack createWand() {
-        ItemStack wand = new ItemStack(Material.STICK);
+        ItemStack wand = new ItemStack(Material.CARROT_ON_A_STICK);
         ItemMeta meta = wand.getItemMeta();
         meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Levitation Wand");
+        meta.setLore(Collections.singletonList(ChatColor.GOLD + "Right Click near a mob to pick it up"));
         meta.getPersistentDataContainer().set(new NamespacedKey("coswayutil", "levitation_wand"), PersistentDataType.STRING, "true");
         wand.setItemMeta(meta);
         return wand;

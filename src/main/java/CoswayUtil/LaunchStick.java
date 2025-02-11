@@ -1,8 +1,6 @@
 package CoswayUtil;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,8 +43,9 @@ public class LaunchStick implements Listener {
 
         // Add player to no-fall damage list
         noFallPlayers.add(player);
-
-        player.sendMessage(ChatColor.GREEN + "You launched yourself forward!");
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP,10,0);
+        player.getWorld().playEffect(player.getLocation(), Effect.TRIAL_SPAWNER_DETECT_PLAYER_OMINOUS,1);
+        //player.sendMessage(ChatColor.GREEN + "You launched yourself forward!");
     }
 
     // Prevent fall damage for launched players

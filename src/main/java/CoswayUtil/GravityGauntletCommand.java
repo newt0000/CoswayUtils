@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Collections;
+
 public class GravityGauntletCommand implements CommandExecutor {
 
     @Override
@@ -20,6 +22,7 @@ public class GravityGauntletCommand implements CommandExecutor {
 
             if (meta != null) {
                 meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Gravity Gauntlet");
+                meta.setLore(Collections.singletonList(ChatColor.GOLD + "Right Click to pull, Shift+Right Click to throw"));
                 meta.setUnbreakable(true);
                 gauntlet.setItemMeta(meta);
             }
