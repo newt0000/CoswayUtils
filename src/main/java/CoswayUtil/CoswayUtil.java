@@ -2,7 +2,9 @@ package CoswayUtil;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.type.LightningRod;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
@@ -112,6 +114,10 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                 returnMsg(player,"&aYou threw "+Target.getName());
             }
         }
+        if (cmd.getName().equalsIgnoreCase("rapidbow") && sender instanceof Player player) {
+            player.getInventory().addItem(RapidFireBow.createRapidFireBow());
+        }
+
         return true;
     }
 
@@ -353,6 +359,33 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                     }
                 }
             }
+        }
+        @EventHandler
+        public void placedevent(BlockPlaceEvent event) {
+            Block placed = event.getBlockPlaced();
+            Player player = event.getPlayer();
+
+            if (placed.getType() == Material.RESPAWN_ANCHOR) {
+                Location above = placed.getLocation().clone().add(0, 1, 0);
+                Block blockAbove = placed.getWorld().getBlockAt(above);
+
+                // Check if the player has at least one Lightning Rod
+                if (player.getInventory().contains(Material.LIGHTNING_ROD, 1)) {
+                    blockAbove.setType(Material.LIGHTNING_ROD);
+
+                    // Ensure the Lightning Rod is placed upright
+                    LightningRod rodData = (LightningRod) blockAbove.getBlockData();
+                    rodData.setFacing(BlockFace.UP);
+                    blockAbove.setBlockData(rodData);
+
+                    // Remove one Lightning Rod from the player's inventory
+                    ItemStack lightningRod = new ItemStack(Material.LIGHTNING_ROD, 1);
+                    player.getInventory().removeItem(lightningRod);
+                } else {
+                    player.sendMessage(ChatColor.RED + "You need a Lightning Rod in your inventory to place one!");
+                }
+            }
+
         }
         private void killHostileMobs(Location loc) {
             loc.getWorld().getEntitiesByClass(Monster.class).forEach(mob -> {

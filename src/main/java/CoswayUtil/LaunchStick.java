@@ -19,7 +19,7 @@ import java.util.Set;
 public class LaunchStick implements Listener {
     private final CoswayUtil plugin;
     private final Set<Player> noFallPlayers = new HashSet<>();
-    private final double LAUNCH_POWER = 4.0; // Adjust this to change launch strength
+    private final double LAUNCH_POWER = 3.0; // Adjust this to change launch strength
 
     public LaunchStick(CoswayUtil plugin) {
         this.plugin = plugin;
@@ -42,7 +42,9 @@ public class LaunchStick implements Listener {
         player.setVelocity(direction);
 
         // Add player to no-fall damage list
-        noFallPlayers.add(player);
+        if(player.getLocation().clone().subtract(0,1,0).getBlock().getType() == Material.AIR) {
+            noFallPlayers.add(player);
+        }
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BREEZE_JUMP,10,0);
         player.getWorld().playEffect(player.getLocation(), Effect.TRIAL_SPAWNER_DETECT_PLAYER_OMINOUS,1);
         //player.sendMessage(ChatColor.GREEN + "You launched yourself forward!");

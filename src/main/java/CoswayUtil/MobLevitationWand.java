@@ -80,19 +80,19 @@ public class MobLevitationWand implements Listener {
                     return;
                 }
 
-                Vector direction = player.getLocation().getDirection().normalize().multiply(5);
+                Vector direction = player.getLocation().getDirection().normalize().multiply(8);
                 Location newLocation = player.getLocation().add(direction);
                 World world = player.getWorld();
 
                 // Ensure the mob is not placed inside a solid block
-                while (newLocation.getBlock().getType().isSolid()) {
-                    newLocation.add(0, 1, 0); // Move up until a free space is found
-                }
-
-                // Ensure the mob is not underground
-                int highestY = world.getHighestBlockYAt(newLocation);
-                if (newLocation.getY() < highestY) {
-                    newLocation.setY(highestY + 1); // Adjust to be above ground
+                if (newLocation.getBlock().getType().isSolid()) {
+                    Location safeLocation = findSafeLocation(newLocation);
+                    if (safeLocation != null) {
+                        newLocation = safeLocation;
+                    } else {
+                        player.sendMessage(ChatColor.RED + "No safe location found for teleporting!");
+                        return;
+                    }
                 }
 
                 entity.teleport(newLocation);
@@ -107,6 +107,24 @@ public class MobLevitationWand implements Listener {
             }
         }.runTaskTimer(plugin, 0L, 2L);
     }
+
+    /**
+     * Finds the nearest safe location for teleportation by searching upwards but not going to max height.
+     */
+    private Location findSafeLocation(Location loc) {
+        World world = loc.getWorld();
+        int maxHeight = world.getMaxHeight();
+
+        for (int y = loc.getBlockY(); y < maxHeight; y++) {
+            Location checkLoc = new Location(world, loc.getX(), y, loc.getZ());
+            if (!checkLoc.getBlock().getType().isSolid() && !checkLoc.clone().add(0, 1, 0).getBlock().getType().isSolid()) {
+                return checkLoc; // Found a safe spot
+            }
+        }
+
+        return null; // No valid space found
+    }
+
 
 
     private void releaseMob(Player player) {

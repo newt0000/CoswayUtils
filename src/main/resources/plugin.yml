@@ -25,3 +25,7 @@ commands:
     description: give player a stick to use for launching themselves
     usage: /launchstick
     permission: CoswayUtil.launchStick
+  rapidbow:
+    description: gives player a rapid fire bow
+    usage: /rapidbow
+    permission: CoswayUtil.rapidBow
