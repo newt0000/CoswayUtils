@@ -7,6 +7,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.LightningRod;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Monster;
 import org.bukkit.event.EventHandler;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.block.data.type.RespawnAnchor;
 import CoswayUtil.GravityGauntletCommand;
-
+import net.milkbowl.vault.economy.Economy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +39,13 @@ import java.util.Map;
 
 
 public final class CoswayUtil extends JavaPlugin implements Listener {
-
+    private Economy economy;
+    private FileConfiguration config;
     @Override
     public void onEnable() {
+        // Create or load the configuration file
+        saveDefaultConfig();  // This creates the config file if it doesn't exist.
+        config = getConfig(); // Get the loaded configuration
         serverMessage(ColorKey("&aaw sheit here we go again...."));
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
         // Start the detection loop when the plugin is enabled
@@ -73,6 +78,16 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         new TotemShield(this);
         // Register the ShadowStep listener
         new MobLevitationWand(this);
+        if (!setupEconomy()) {
+            getLogger().severe("Vault not found or no economy provider found.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        new BlockShop(this, economy).register();
+        new BlockShop(this, economy);
+        new RapidFireBow(this);
+        getServer().getPluginManager().registerEvents(new RapidFireBow(this), this);
         getServer().getPluginManager().registerEvents(new ShadowStep(this), this);
         //register levitation wand
         Bukkit.getPluginManager().registerEvents(new MobLevitationWand(this), this);
@@ -84,11 +99,17 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
         this.getCommand("getwand").setExecutor(new GiveWandCommand());
         getServer().getPluginManager().registerEvents(new LaunchStick(this), this);
-
-
-
     }
 
+
+    private boolean setupEconomy() {
+        // Setup Vault economy (make sure it's enabled and available)
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            economy = getServer().getServicesManager().getRegistration(Economy.class).getProvider();
+            return economy != null;
+        }
+        return false;
+    }
     @Override
     public void onDisable() {
         serverMessage(ColorKey("&cim dead, im alive but im dead...."));
@@ -103,6 +124,12 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         }
         if (cmd.getName().equalsIgnoreCase("launchstick") && sender instanceof Player player) {
             player.getInventory().addItem(LaunchStick.createLaunchStick());
+        }
+        if (cmd.getName().equalsIgnoreCase("blockshop") && sender instanceof Player player) {
+            BlockShop.openShop(player,1);
+        }
+        if (cmd.getName().equalsIgnoreCase("shopbook") && sender instanceof Player player) {
+            player.getInventory().addItem(BlockShop.createShopItem());
         }
         if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player player) {
             Player Target = getNearestPlayer(player,10);

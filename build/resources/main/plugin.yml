@@ -1,9 +1,10 @@
 name: CoswayUtil
-version: '1.10-RELEASE'
+version: '1.11-RELEASE'
 main: CoswayUtil.CoswayUtil
 description: "utility plugin for Cosway servers, a yescraft network server"
 api-version: '1.21'
 author: "Newt_00"
+depend: [Vault]
 website: "ycs.Newt-Tech.com"
 commands:
   scale:
@@ -22,6 +23,18 @@ commands:
     usage: "/getwand"
     permission: CoswayUtil.wand
   launchstick:
-    description: give player a stick to use for launching themselves
-    usage: /launchstick
+    description: "give player a stick to use for launching themselves"
+    usage: "/launchstick"
     permission: CoswayUtil.launchStick
+  rapidbow:
+    description: "gives player a rapid fire bow"
+    usage: "/rapidbow"
+    permission: CoswayUtil.rapidBow
+  shopbook:
+    description: "gives player shop book"
+    usage: "/shopbook"
+    permission: CoswayUtil.shop
+  blockshop:
+    description: "opens block shop"
+    usage: "/blockshop"
+    permission: CoswayUtil.shop

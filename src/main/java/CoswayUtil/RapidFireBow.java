@@ -1,12 +1,16 @@
 package CoswayUtil;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -25,6 +29,16 @@ public class RapidFireBow implements Listener {
     public RapidFireBow(CoswayUtil plugin) {
         this.plugin = plugin;
     }
+    public void removeGroundedArrows() {
+        for (World world : Bukkit.getWorlds()) {
+            for (Arrow arrow : world.getEntitiesByClass(Arrow.class)) {
+                if (arrow.isOnGround()) {
+                    arrow.remove();
+                }
+            }
+        }
+    }
+
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
@@ -36,6 +50,8 @@ public class RapidFireBow implements Listener {
 
         // If the player is already shooting, do nothing
         if (shootingTasks.containsKey(player.getUniqueId())) return;
+
+
 
         // Start firing arrows every tick
         BukkitRunnable task = new BukkitRunnable() {
@@ -62,8 +78,14 @@ public class RapidFireBow implements Listener {
         shootingTasks.put(player.getUniqueId(), task);
     }
 
+    // Stop shooting when the player switches item or swaps hands
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onItemSwitch(PlayerItemHeldEvent event) {
+        stopShooting(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onSwapHands(PlayerSwapHandItemsEvent event) {
         stopShooting(event.getPlayer());
     }
 
@@ -83,6 +105,7 @@ public class RapidFireBow implements Listener {
         if (shootingTasks.containsKey(playerId)) {
             shootingTasks.get(playerId).cancel();
             shootingTasks.remove(playerId);
+            removeGroundedArrows();
         }
     }
 
@@ -90,7 +113,7 @@ public class RapidFireBow implements Listener {
         ItemStack bow = new ItemStack(Material.BOW);
         ItemMeta meta = bow.getItemMeta();
         meta.setDisplayName(ChatColor.GOLD + "Rapid-Fire Bow");
-        meta.setLore(Collections.singletonList(ChatColor.RED + "Hold Right-Click to unleash rapid arrows!"));
+        meta.setLore(Collections.singletonList(ChatColor.RED + "Press Right-Click to unleash rapid arrows! Switch hands to stop."));
         meta.getPersistentDataContainer().set(new NamespacedKey("coswayutil", "rapid_fire_bow"), PersistentDataType.STRING, "true");
         bow.setItemMeta(meta);
         return bow;
