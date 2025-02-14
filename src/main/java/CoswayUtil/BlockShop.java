@@ -213,9 +213,16 @@ public class BlockShop implements Listener {
         return sb.toString();
     }
     public String getConfigLine(String source, String dfault) {
-        plugin.reloadConfig();
-        return config != null ? config.getString(source, dfault) : dfault;
+        reloadShopConfig();
+        String value = plugin.getConfig().getString(source, dfault);
+        if (!config.contains(source)) {
+            config.set(source, dfault);
+            plugin.saveConfig();
+        }
+        Bukkit.getLogger().info("Fetching config key: " + source + " | Found: " + value);
+        return value;
     }
+
 
     // Helper method to retrieve the price of an item (can be customized to use a config file for prices)
     private double getPrice(ItemStack item) {
