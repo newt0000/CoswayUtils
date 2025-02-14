@@ -164,25 +164,57 @@ public class BlockShop implements Listener {
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem != null && clickedItem.getType() != Material.AIR) {
                 double price = getPrice(clickedItem);
-                if (economy.has(player, price)) {
-                    economy.withdrawPlayer(player, price);
-                    // Create a new ItemStack with the default meta
-                    ItemStack sold = new ItemStack(clickedItem.getType(), clickedItem.getAmount());
-
-                    // Reset item meta (default name, no lore)
-                    ItemMeta defaultMeta = sold.getItemMeta();
-                    if (defaultMeta != null) {
-                        defaultMeta.setDisplayName(null); // Reset to default name
-                        defaultMeta.setLore(null); // Remove lore
-                        sold.setItemMeta(defaultMeta);
-                    }
-                    player.getInventory().addItem(sold);
-                    player.sendMessage(ChatColor.GREEN + "You bought " + sold.getType() + " for $" + price);
-                } else {
-                    player.sendMessage(ChatColor.RED + "You don't have enough money to buy this.");
+                if (!economy.has(player, price)) {
+                    player.sendMessage(ChatColor.RED + getConfigLine("poor", "You don't have enough money to buy this."));
+                    return;
                 }
+
+                // Create a new ItemStack with the default meta
+                ItemStack sold = new ItemStack(clickedItem.getType(), clickedItem.getAmount());
+
+                // Reset item meta (default name, no lore)
+                ItemMeta defaultMeta = sold.getItemMeta();
+                if (defaultMeta != null) {
+                    defaultMeta.setDisplayName(null); // Reset to default name
+                    defaultMeta.setLore(null); // Remove lore
+                    sold.setItemMeta(defaultMeta);
+                }
+
+                // Check if player's inventory has space before proceeding
+                HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(sold);
+                if (!leftover.isEmpty()) {
+                    // If there are leftover items, inventory is full
+                    player.sendMessage(ChatColor.RED + getConfigLine("inventory_full", "Your inventory is full! Purchase failed."));
+                    return;
+                }
+
+                // If inventory had space, finalize the purchase
+                economy.withdrawPlayer(player, price);
+                player.sendMessage(ColorKey("&aYou bought &b" + clickedItem.getAmount() + " &7" +
+                        String.valueOf(sold.getType()).toLowerCase().replace("_", " ") +
+                        "&a for &6$" + price));
             }
         }
+    }
+
+    public String ColorKey(String t) {
+        char searchChar = '&';  // Character to search for
+        char replacementChar = '§';  // Character to replace with
+        StringBuilder sb = new StringBuilder(t);
+        // Search for the character in the StringBuilder
+        int index = sb.indexOf(String.valueOf(searchChar));
+
+        // Replace the character if found
+        for (int j = 0; j < sb.length(); j++) {
+            if (sb.charAt(j) == searchChar) {
+                sb.setCharAt(j, replacementChar);
+            }
+        }
+        return sb.toString();
+    }
+    public String getConfigLine(String source, String dfault) {
+        plugin.reloadConfig();
+        return config != null ? config.getString(source, dfault) : dfault;
     }
 
     // Helper method to retrieve the price of an item (can be customized to use a config file for prices)

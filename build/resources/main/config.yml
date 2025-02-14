@@ -12,5 +12,6 @@ shop:
           material: OAK_PLANKS
           price: 15
           display_name: "Oak Planks"
+poor: "you're poor..."
 pagination:
   max_items_per_page: 45  # Max items to display per page
