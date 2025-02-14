@@ -1,34 +1,16 @@
-# config.yml
-
 shop:
   categories:
-    - name: "Building Blocks"
+    stone_blocks:
       items:
-        - material: "STONE"
-          price: 1
-          display_name: "Stone"
-        - material: "WOOD"
-          price: 2
-          display_name: "Wood"
-        - material: "BRICK"
-          price: 3
-          display_name: "Brick"
-    - name: "Decorative Blocks"
-      items:
-        - material: "LANTERN"
-          price: 5
-          display_name: "Lantern"
-        - material: "PAINTING"
+        stone:
+          material: STONE
           price: 10
-          display_name: "Painting"
-    - name: "Tools"
+          display_name: "Stone Block"
+    wood_blocks:
       items:
-        - material: "WOODEN_SWORD"
-          price: 10
-          display_name: "Wooden Sword"
-        - material: "IRON_SWORD"
-          price: 20
-          display_name: "Iron Sword"
-
+        oak_planks:
+          material: OAK_PLANKS
+          price: 15
+          display_name: "Oak Planks"
 pagination:
   max_items_per_page: 45  # Max items to display per page

@@ -2,6 +2,7 @@ package CoswayUtil;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class BlockShop implements Listener {
-    private JavaPlugin plugin;
+    private static JavaPlugin plugin;
     private final Economy economy;
     private static FileConfiguration config;
 
@@ -26,6 +27,7 @@ public class BlockShop implements Listener {
     public BlockShop(JavaPlugin plugin, Economy economy) {
         this.plugin = plugin;
         this.economy = economy;
+        config = plugin.getConfig(); // Fix: Initialize config properly
     }
 
     // Method to create the special book (or other item) to open the shop
@@ -39,18 +41,25 @@ public class BlockShop implements Listener {
         return item;
     }
 
-
-
-    public void ShopGUI(JavaPlugin plugin) {
-        this.plugin = plugin;
-        config = plugin.getConfig();
-    }
-
     public static void openShop(Player player, int page) {
-        Inventory shopInventory = Bukkit.createInventory(null, 54, "Shop");
+        reloadShopConfig();
+        Inventory shopInventory = Bukkit.createInventory(null, 54, ChatColor.GREEN+"Block Shop");
 
         // Get the categories from the config
-        List<String> categories = config.getStringList("shop.categories");
+        if (config == null) {
+            player.sendMessage(ChatColor.RED + "Shop configuration is missing.");
+            return;
+        }
+
+        ConfigurationSection categoriesSection = config.getConfigurationSection("shop.categories");
+        ConfigurationSection Conf = config.getConfigurationSection("shop");
+        if (categoriesSection == null) {
+            player.sendMessage(ChatColor.RED + "No categories found in the shop.");
+            player.sendMessage(ChatColor.AQUA + "" + Conf);
+            return;
+        }
+
+        Set<String> categories = categoriesSection.getKeys(false);
         int maxItemsPerPage = config.getInt("pagination.max_items_per_page");
         int startIndex = (page - 1) * maxItemsPerPage;
         int endIndex = startIndex + maxItemsPerPage;
@@ -62,8 +71,18 @@ public class BlockShop implements Listener {
             // Calculate the correct number of items for pagination
             for (int i = startIndex; i < endIndex && i < items.size(); i++) {
                 ItemStack item = items.get(i);
+
+                // Get the item key from config based on index
+                String itemKey = new ArrayList<>(config.getConfigurationSection("shop.categories." + categoryName + ".items").getKeys(false)).get(i);
+
+                // Retrieve the quantity from the config
+                int quantity = config.getInt("shop.categories." + categoryName + ".items." + itemKey + ".quantity", 64); // Default 64 if missing
+
+                // Set the correct stack size
+                item.setAmount(quantity);
                 shopInventory.addItem(item);
             }
+
         }
 
         // Show inventory to the player
@@ -71,32 +90,42 @@ public class BlockShop implements Listener {
     }
 
     private static List<ItemStack> loadItemsFromCategory(String category) {
-        List<ItemStack> items = new ArrayList<>();
+        List<ItemStack> items = new ArrayList<>(); // Correct variable name
 
         // Load items for the category from the config
-        List<String> itemList = config.getStringList("shop.categories." + category + ".items");
+        ConfigurationSection itemSection = config.getConfigurationSection("shop.categories." + category + ".items");
+        if (itemSection == null) {
+            return items;
+        }
 
-        for (String item : itemList) {
-            String materialName = config.getString("shop.categories." + category + ".items." + item + ".material");
-            Material material = Material.getMaterial(materialName.toUpperCase());
-            int price = config.getInt("shop.categories." + category + ".items." + item + ".price");
-            String displayName = config.getString("shop.categories." + category + ".items." + item + ".display_name");
+        for (String itemKey : itemSection.getKeys(false)) {
+            String materialName = config.getString("shop.categories." + category + ".items." + itemKey + ".material");
+            int price = config.getInt("shop.categories." + category + ".items." + itemKey + ".price");
+            String displayName = config.getString("shop.categories." + category + ".items." + itemKey + ".display_name");
 
-            if (material != null) {
-                ItemStack itemStack = new ItemStack(material);
-                ItemMeta meta = itemStack.getItemMeta();
-                if (meta != null) {
-                    meta.setDisplayName(displayName);
-                    List<String> lore = new ArrayList<>();
-                    lore.add(ChatColor.GOLD + "Price: " + price + " coins");
-                    meta.setLore(lore);
-                    itemStack.setItemMeta(meta);
-                    items.add(itemStack);
+            if (materialName != null) {
+                Material material = Material.matchMaterial(materialName.toUpperCase());
+                if (material != null) {
+                    ItemStack itemStack = new ItemStack(material);
+                    ItemMeta meta = itemStack.getItemMeta();
+                    if (meta != null) {
+                        meta.setDisplayName(ChatColor.GREEN + (displayName != null ? displayName : "Unnamed Item"));
+                        List<String> lore = new ArrayList<>();
+                        lore.add(ChatColor.GOLD + "Price: $" + price);
+                        meta.setLore(lore);
+                        itemStack.setItemMeta(meta);
+                        items.add(itemStack);
+                    }
                 }
             }
         }
 
         return items;
+    }
+
+    public static void reloadShopConfig() {
+        plugin.reloadConfig(); // Reloads config from disk
+        config = plugin.getConfig(); // Reassign the updated config
     }
 
     // Helper method to add items to the shop
@@ -129,7 +158,7 @@ public class BlockShop implements Listener {
         Player player = (Player) event.getWhoClicked();
         InventoryView clickedInventory = event.getWhoClicked().getOpenInventory();
 
-        if (clickedInventory.getTitle().equals(ChatColor.DARK_GREEN + "Block Shop")) {
+        if (clickedInventory.getTitle().equals(ChatColor.GREEN + "Block Shop")) {
             event.setCancelled(true); // Prevent item from being moved
 
             ItemStack clickedItem = event.getCurrentItem();
@@ -137,10 +166,20 @@ public class BlockShop implements Listener {
                 double price = getPrice(clickedItem);
                 if (economy.has(player, price)) {
                     economy.withdrawPlayer(player, price);
-                    player.getInventory().addItem(clickedItem);
-                    player.sendMessage(ChatColor.GREEN + "You bought " + clickedItem.getType() + " for " + price + " currency.");
+                    // Create a new ItemStack with the default meta
+                    ItemStack sold = new ItemStack(clickedItem.getType(), clickedItem.getAmount());
+
+                    // Reset item meta (default name, no lore)
+                    ItemMeta defaultMeta = sold.getItemMeta();
+                    if (defaultMeta != null) {
+                        defaultMeta.setDisplayName(null); // Reset to default name
+                        defaultMeta.setLore(null); // Remove lore
+                        sold.setItemMeta(defaultMeta);
+                    }
+                    player.getInventory().addItem(sold);
+                    player.sendMessage(ChatColor.GREEN + "You bought " + sold.getType() + " for $" + price);
                 } else {
-                    player.sendMessage(ChatColor.RED + "You don't have enough currency to buy this.");
+                    player.sendMessage(ChatColor.RED + "You don't have enough money to buy this.");
                 }
             }
         }
@@ -148,15 +187,20 @@ public class BlockShop implements Listener {
 
     // Helper method to retrieve the price of an item (can be customized to use a config file for prices)
     private double getPrice(ItemStack item) {
-        // For simplicity, we assign prices based on material name, you can use a config file for more flexibility
-        switch (item.getType()) {
-            case STONE: return 10;
-            case DIRT: return 5;
-            case OAK_PLANKS: return 15;
-            case BRICKS: return 20;
-            default: return 0;
+        for (String category : config.getConfigurationSection("shop.categories").getKeys(false)) {
+            ConfigurationSection itemsSection = config.getConfigurationSection("shop.categories." + category + ".items");
+            if (itemsSection != null) {
+                for (String itemKey : itemsSection.getKeys(false)) {
+                    String materialName = config.getString("shop.categories." + category + ".items." + itemKey + ".material");
+                    if (materialName != null && item.getType() == Material.matchMaterial(materialName.toUpperCase())) {
+                        return config.getDouble("shop.categories." + category + ".items." + itemKey + ".price", 0);
+                    }
+                }
+            }
         }
+        return 0; // Default to 0 if no price is found
     }
+
 
     // Register the block shop commands and events
     public void register() {
