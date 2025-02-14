@@ -20,7 +20,9 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -33,6 +35,7 @@ import org.bukkit.block.data.type.RespawnAnchor;
 import CoswayUtil.GravityGauntletCommand;
 import net.milkbowl.vault.economy.Economy;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,6 +102,36 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
         this.getCommand("getwand").setExecutor(new GiveWandCommand());
         getServer().getPluginManager().registerEvents(new LaunchStick(this), this);
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Gravity Gauntlet")) {
+                        ItemStack gauntlet = new ItemStack(Material.NETHERITE_HOE); // You can change this to any item you prefer
+                        ItemMeta meta = gauntlet.getItemMeta();
+
+                        if (meta != null) {
+                            meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Gravity Gauntlet");
+                            meta.setLore(Collections.singletonList(ChatColor.GOLD + "Right Click to pull, Shift+Right Click to throw"));
+                            meta.setUnbreakable(true);
+                            gauntlet.setItemMeta(meta);
+                        }
+
+                        player.getInventory().addItem(gauntlet);
+                    }
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Launch Stick")) {
+                        player.getInventory().addItem(LaunchStick.createLaunchStick());
+                    }
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Levitation Wand")) {
+                        player.getInventory().addItem(MobLevitationWand.createWand());
+                    }
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Rapid Fire Bow")) {
+                        player.getInventory().addItem(RapidFireBow.createRapidFireBow());
+                    }
+                }
+            }
+        }.runTaskTimer(this,0,2);
     }
 
 
@@ -196,6 +229,21 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         }
         return sb.toString();
     }
+    public boolean removeCustomKnowledgeBook(Player player, String customName) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.KNOWLEDGE_BOOK) {
+                ItemMeta meta = item.getItemMeta();
+                //player.sendMessage("you have a knowledge book with name: \n"+ meta.getDisplayName() + "\n"+customName+"\n do they match?");
+                if (meta != null && meta.hasDisplayName() && meta.getDisplayName().equals(customName)) {
+                    player.getInventory().remove(item); // Remove the book
+                    return true; // Found and removed
+                }
+            }
+        }
+        return false; // No matching book found
+    }
+
+
     public void serverMessage(String msg) {
         getServer().broadcastMessage(prefix()+ColorKey(msg));
     }

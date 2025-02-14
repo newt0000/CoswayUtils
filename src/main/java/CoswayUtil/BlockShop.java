@@ -128,15 +128,7 @@ public class BlockShop implements Listener {
         config = plugin.getConfig(); // Reassign the updated config
     }
 
-    // Helper method to add items to the shop
-    private void addItemToShop(Inventory shop, Material material, String displayName, double price) {
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(displayName);
-        meta.setLore(Collections.singletonList(ChatColor.GOLD + "Price: " + price + " currency"));
-        item.setItemMeta(meta);
-        shop.addItem(item);
-    }
+
 
     // Handle item right-click to open the shop
     @EventHandler
@@ -152,14 +144,21 @@ public class BlockShop implements Listener {
         }
     }
 
-    // Handle purchases from the shop
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         InventoryView clickedInventory = event.getWhoClicked().getOpenInventory();
+        Inventory topInventory = clickedInventory.getTopInventory(); // The shop inventory
+        Inventory clickedSlotInventory = event.getClickedInventory(); // Where the click happened
 
+        // Ensure the clicked inventory is the Block Shop (not player's inventory)
         if (clickedInventory.getTitle().equals(ChatColor.GREEN + "Block Shop")) {
-            event.setCancelled(true); // Prevent item from being moved
+            event.setCancelled(true); // Prevent item movement
+
+            // Ignore clicks outside the shop inventory
+            if (clickedSlotInventory == null || !clickedSlotInventory.equals(topInventory)) {
+                return;
+            }
 
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem != null && clickedItem.getType() != Material.AIR) {
@@ -170,25 +169,26 @@ public class BlockShop implements Listener {
                 }
 
                 // Create a new ItemStack with the default meta
-                ItemStack sold = new ItemStack(clickedItem.getType(), clickedItem.getAmount());
+                ItemStack sold = clickedItem.clone();
 
-                // Reset item meta (default name, no lore)
-                ItemMeta defaultMeta = sold.getItemMeta();
-                if (clickedItem.getType() != Material.KNOWLEDGE_BOOK  && defaultMeta != null) {
-                    defaultMeta.setDisplayName(null); // Reset to default name
-                    defaultMeta.setLore(null); // Remove lore
-                    sold.setItemMeta(defaultMeta);
+                // Only reset the meta if the item is NOT a Knowledge Book
+                if (clickedItem.getType() != Material.KNOWLEDGE_BOOK) {
+                    ItemMeta defaultMeta = sold.getItemMeta();
+                    if (defaultMeta != null) {
+                        defaultMeta.setDisplayName(null);
+                        defaultMeta.setLore(null);
+                        sold.setItemMeta(defaultMeta);
+                    }
                 }
 
                 // Check if player's inventory has space before proceeding
                 HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(sold);
                 if (!leftover.isEmpty()) {
-                    // If there are leftover items, inventory is full
                     player.sendMessage(ChatColor.RED + getConfigLine("inventory_full", "Your inventory is full! Purchase failed."));
                     return;
                 }
 
-                // If inventory had space, finalize the purchase
+                // Finalize the purchase
                 economy.withdrawPlayer(player, price);
                 player.sendMessage(ColorKey("&aYou bought &b" + clickedItem.getAmount() + " &7" +
                         String.valueOf(sold.getType()).toLowerCase().replace("_", " ") +
@@ -196,6 +196,7 @@ public class BlockShop implements Listener {
             }
         }
     }
+
 
     public String ColorKey(String t) {
         char searchChar = '&';  // Character to search for
