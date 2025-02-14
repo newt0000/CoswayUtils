@@ -12,6 +12,28 @@ shop:
           material: OAK_PLANKS
           price: 15
           display_name: "Oak Planks"
+    utilities:
+      items:
+        grav:
+          material: KNOWLEDGE_BOOK
+          price: 1000000
+          quantity: 1
+          display_name: "Gravity Gauntlet"
+        wand:
+          material: KNOWLEDGE_BOOK
+          price: 1000000
+          quantity: 1
+          display_name: "Levitation Wand"
+        launch:
+          material: KNOWLEDGE_BOOK
+          price: 1000000
+          quantity: 1
+          display_name: "Launch Stick"
+        bow:
+          material: KNOWLEDGE_BOOK
+          price: 1000000
+          quantity: 1
+          display_name: "Rapid Fire Bow"
 poor: "you're poor..."
 inventory_full: "you got too much clutter, cant fit your purchase into that mess..."
 pagination:
