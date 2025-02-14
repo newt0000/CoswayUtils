@@ -174,7 +174,7 @@ public class BlockShop implements Listener {
 
                 // Reset item meta (default name, no lore)
                 ItemMeta defaultMeta = sold.getItemMeta();
-                if (defaultMeta != null) {
+                if (clickedItem.getType() != Material.KNOWLEDGE_BOOK  && defaultMeta != null) {
                     defaultMeta.setDisplayName(null); // Reset to default name
                     defaultMeta.setLore(null); // Remove lore
                     sold.setItemMeta(defaultMeta);
