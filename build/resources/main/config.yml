@@ -13,5 +13,6 @@ shop:
           price: 15
           display_name: "Oak Planks"
 poor: "you're poor..."
+inventory_full: "you got too much clutter, cant fit your purchase into that mess..."
 pagination:
   max_items_per_page: 45  # Max items to display per page
