@@ -82,6 +82,11 @@ shop:
           display_name: "Obsidian"
     utilities:
       items:
+        ASK:
+          material: KNOWLEDGE_BOOK
+          price: 450000
+          quantity: 1
+          display_name: "Anchor Shield Kit"
         gravity_gauntlet:
           material: KNOWLEDGE_BOOK
           price: 200000

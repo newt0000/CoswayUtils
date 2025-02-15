@@ -123,6 +123,13 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Launch Stick")) {
                         player.getInventory().addItem(LaunchStick.createLaunchStick());
                     }
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Anchor Shield Kit")) {
+                        // Create a chest item
+                        ItemStack chest = new ItemStack(Material.CHEST, 1);
+
+                        // Give the chest and items to the player
+                        player.getInventory().addItem(chest, new ItemStack(Material.RESPAWN_ANCHOR, 1), new ItemStack(Material.LIGHTNING_ROD, 5),new ItemStack(Material.HEAVY_CORE,1));
+                    }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Levitation Wand")) {
                         player.getInventory().addItem(MobLevitationWand.createWand());
                     }

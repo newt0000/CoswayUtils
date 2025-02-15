@@ -4,37 +4,110 @@ shop:
       items:
         stone:
           material: STONE
-          price: 10
+          price: 192
+          quantity: 64
           display_name: "Stone Block"
+        smooth_stone:
+          material: SMOOTH_STONE
+          price: 320
+          quantity: 64
+          display_name: "Smooth Stone"
     wood_blocks:
       items:
         oak_planks:
           material: OAK_PLANKS
-          price: 15
+          price: 960
+          quantity: 64
           display_name: "Oak Planks"
+    pvp:
+      items:
+        iron_helmet:
+          material: IRON_HELMET
+          price: 110
+          quantity: 1
+          display_name: "Iron Helmet"
+        iron_chestplate:
+          material: IRON_CHESTPLATE
+          price: 176
+          quantity: 1
+          display_name: "Iron Chestplate"
+        iron_leggings:
+          material: IRON_LEGGINGS
+          price: 154
+          quantity: 1
+          display_name: "Iron Leggings"
+        iron_boots:
+          material: IRON_BOOTS
+          price: 88
+          quantity: 1
+          display_name: "Iron Boots"
+        iron_sword:
+          material: IRON_SWORD
+          price: 44
+          quantity: 1
+          display_name: "Iron Sword"
+        iron_PICKAXE:
+          material: IRON_PICKAXE
+          price: 66
+          quantity: 1
+          display_name: "Iron Pick"
+        iron_axe:
+          material: IRON_AXE
+          price: 66
+          quantity: 1
+          display_name: "Iron Axe"
+        iron_shovel:
+          material: IRON_SHOVEL
+          price: 22
+          quantity: 1
+          display_name: "Iron Spoon"
+    redstone:
+      items:
+        repeater:
+          material: REPEATER
+          price: 900
+          quantity: 18
+          display_name: "Repeater"
+        redstone:
+          material: REDSTONE
+          price: 2048
+          quantity: 64
+          display_name: "Redstone Dust"
+    nether:
+      items:
+        obsidian:
+          material: OBSIDIAN
+          price: 1300
+          quantity: 10
+          display_name: "Obsidian"
     utilities:
       items:
-        grav:
+        ASK:
           material: KNOWLEDGE_BOOK
-          price: 1000000
+          price: 450000
+          quantity: 1
+          display_name: "Anchor Shield Kit"
+        gravity_gauntlet:
+          material: KNOWLEDGE_BOOK
+          price: 200000
           quantity: 1
           display_name: "Gravity Gauntlet"
-        wand:
+        levitation_wand:
           material: KNOWLEDGE_BOOK
           price: 1000000
           quantity: 1
           display_name: "Levitation Wand"
-        launch:
+        launch_stick:
           material: KNOWLEDGE_BOOK
-          price: 1000000
+          price: 1234567
           quantity: 1
           display_name: "Launch Stick"
-        bow:
+        rapid_fire_bow:
           material: KNOWLEDGE_BOOK
-          price: 1000000
+          price: 9000000
           quantity: 1
           display_name: "Rapid Fire Bow"
-poor: "you're poor..."
+poor: "you're too poor for that, get gooder..."
 inventory_full: "you got too much clutter, cant fit your purchase into that mess..."
 pagination:
   max_items_per_page: 45  # Max items to display per page
