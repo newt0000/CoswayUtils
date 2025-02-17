@@ -95,7 +95,7 @@ public class IlluminationWand implements Listener {
         player.getWorld().spawnParticle(Particle.END_ROD, placeLocation.getLocation().add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, 0);
         player.getWorld().playSound(placeLocation.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.5f);
 
-        player.sendMessage(ChatColor.GREEN + "Light placed!");
+        //player.sendMessage(ChatColor.GREEN + "Light placed!");
     }
 }
 
