@@ -139,9 +139,13 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Rapid Fire Bow")) {
                         player.getInventory().addItem(RapidFireBow.createRapidFireBow());
                     }
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Illumination Wand")) {
+                        player.getInventory().addItem(IlluminationWand.getIlluminationWand());
+                    }
                 }
             }
         }.runTaskTimer(this,0,2);
+        new IlluminationWand(this);
     }
 
 
@@ -173,6 +177,9 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         }
         if (cmd.getName().equalsIgnoreCase("shopbook") && sender instanceof Player player) {
             player.getInventory().addItem(BlockShop.createShopItem());
+        }
+        if (cmd.getName().equalsIgnoreCase("Illumination Wand") && sender instanceof Player player) {
+            player.getInventory().addItem(IlluminationWand.getIlluminationWand());
         }
         if (cmd.getName().equalsIgnoreCase("throw") && sender instanceof Player player) {
             Player Target = getNearestPlayer(player,10);

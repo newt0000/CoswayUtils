@@ -103,8 +103,8 @@ public class BlockShop implements Listener {
             String materialName = config.getString("shop.categories." + category + ".items." + itemKey + ".material");
             int price = config.getInt("shop.categories." + category + ".items." + itemKey + ".price");
             String displayName = config.getString("shop.categories." + category + ".items." + itemKey + ".display_name");
-            boolean locked = config.getBoolean("shop.categories." + category + ".items." + itemKey + ".available");
-            if (!locked) {
+            boolean available = config.getBoolean("shop.categories." + category + ".items." + itemKey + ".available");
+            if (available) {
                 if (materialName != null) {
                     Material material = Material.matchMaterial(materialName.toUpperCase());
                     if (material != null) {

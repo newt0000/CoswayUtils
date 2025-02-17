@@ -126,6 +126,12 @@ shop:
           quantity: 1
           display_name: "Rapid Fire Bow"
           available: true
+        illumination_wand:
+          material: KNOWLEDGE_BOOK
+          price: 9000000
+          quantity: 1
+          display_name: "Illumination Wand"
+          available: true
 poor: "you're too poor for that, get gooder..."
 inventory_full: "you got too much clutter, cant fit your purchase into that mess..."
 pagination:
