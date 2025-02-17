@@ -171,7 +171,10 @@ public class BlockShop implements Listener {
             if (clickedItem != null && clickedItem.getType() != Material.AIR) {
                 double price = getPrice(clickedItem);
                 if (!economy.has(player, price)) {
-                    player.sendMessage(ChatColor.RED + getConfigLine("poor", "You don't have enough money to buy this."));
+                    // Format price with commas
+                    NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+                    String formattedPrice = formatter.format(price);
+                    player.sendMessage(ChatColor.RED + getConfigLine("poor", "You don't have enough money to buy this. for "+formattedPrice));
                     return;
                 }
 
@@ -197,9 +200,12 @@ public class BlockShop implements Listener {
 
                 // Finalize the purchase
                 economy.withdrawPlayer(player, price);
+                // Format price with commas
+                NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+                String formattedPrice = formatter.format(price);
                 player.sendMessage(ColorKey("&aYou bought &b" + clickedItem.getAmount() + " &7" +
                         String.valueOf(sold.getType()).toLowerCase().replace("_", " ") +
-                        "&a for &6$" + price));
+                        "&a for &6$" + formattedPrice));
             }
         }
     }
@@ -238,15 +244,23 @@ public class BlockShop implements Listener {
             ConfigurationSection itemsSection = config.getConfigurationSection("shop.categories." + category + ".items");
             if (itemsSection != null) {
                 for (String itemKey : itemsSection.getKeys(false)) {
+                    // Retrieve the material from the config
                     String materialName = config.getString("shop.categories." + category + ".items." + itemKey + ".material");
                     if (materialName != null && item.getType() == Material.matchMaterial(materialName.toUpperCase())) {
-                        return config.getDouble("shop.categories." + category + ".items." + itemKey + ".price", 0);
+                        // Retrieve the display name from the config
+                        String displayName = config.getString("shop.categories." + category + ".items." + itemKey + ".display_name");
+
+                        // Compare the display name in the config with the one on the item
+                        if (displayName != null && displayName != null && displayName.equals(displayName)) {
+                            return config.getDouble("shop.categories." + category + ".items." + itemKey + ".price", 0);
+                        }
                     }
                 }
             }
         }
-        return 0; // Default to 0 if no price is found
+        return 1000000000; // Default to 1t if no price is found
     }
+
 
 
     // Register the block shop commands and events
