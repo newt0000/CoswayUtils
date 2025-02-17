@@ -7,11 +7,13 @@ shop:
           price: 192
           quantity: 64
           display_name: "Stone Block"
+          available: true
         smooth_stone:
           material: SMOOTH_STONE
           price: 320
           quantity: 64
           display_name: "Smooth Stone"
+          available: true
     wood_blocks:
       items:
         oak_planks:
@@ -19,6 +21,7 @@ shop:
           price: 960
           quantity: 64
           display_name: "Oak Planks"
+          available: true
     pvp:
       items:
         iron_helmet:
@@ -26,41 +29,49 @@ shop:
           price: 110
           quantity: 1
           display_name: "Iron Helmet"
+          available: true
         iron_chestplate:
           material: IRON_CHESTPLATE
           price: 176
           quantity: 1
           display_name: "Iron Chestplate"
+          available: true
         iron_leggings:
           material: IRON_LEGGINGS
           price: 154
           quantity: 1
           display_name: "Iron Leggings"
+          available: true
         iron_boots:
           material: IRON_BOOTS
           price: 88
           quantity: 1
           display_name: "Iron Boots"
+          available: true
         iron_sword:
           material: IRON_SWORD
           price: 44
           quantity: 1
           display_name: "Iron Sword"
+          available: true
         iron_PICKAXE:
           material: IRON_PICKAXE
           price: 66
           quantity: 1
           display_name: "Iron Pick"
+          available: true
         iron_axe:
           material: IRON_AXE
           price: 66
           quantity: 1
           display_name: "Iron Axe"
+          available: true
         iron_shovel:
           material: IRON_SHOVEL
           price: 22
           quantity: 1
           display_name: "Iron Spoon"
+          available: true
     redstone:
       items:
         repeater:
@@ -68,11 +79,13 @@ shop:
           price: 900
           quantity: 18
           display_name: "Repeater"
+          available: true
         redstone:
           material: REDSTONE
           price: 2048
           quantity: 64
           display_name: "Redstone Dust"
+          available: true
     nether:
       items:
         obsidian:
@@ -80,6 +93,7 @@ shop:
           price: 1300
           quantity: 10
           display_name: "Obsidian"
+          available: true
     utilities:
       items:
         ASK:
@@ -87,26 +101,31 @@ shop:
           price: 450000
           quantity: 1
           display_name: "Anchor Shield Kit"
+          available: true
         gravity_gauntlet:
           material: KNOWLEDGE_BOOK
           price: 200000
           quantity: 1
           display_name: "Gravity Gauntlet"
+          available: true
         levitation_wand:
           material: KNOWLEDGE_BOOK
           price: 1000000
           quantity: 1
           display_name: "Levitation Wand"
+          available: true
         launch_stick:
           material: KNOWLEDGE_BOOK
           price: 1234567
           quantity: 1
           display_name: "Launch Stick"
+          available: true
         rapid_fire_bow:
           material: KNOWLEDGE_BOOK
           price: 9000000
           quantity: 1
           display_name: "Rapid Fire Bow"
+          available: true
 poor: "you're too poor for that, get gooder..."
 inventory_full: "you got too much clutter, cant fit your purchase into that mess..."
 pagination:

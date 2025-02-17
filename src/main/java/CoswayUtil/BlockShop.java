@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.NumberFormat;
 import java.util.*;
 
 public class BlockShop implements Listener {
@@ -102,21 +103,27 @@ public class BlockShop implements Listener {
             String materialName = config.getString("shop.categories." + category + ".items." + itemKey + ".material");
             int price = config.getInt("shop.categories." + category + ".items." + itemKey + ".price");
             String displayName = config.getString("shop.categories." + category + ".items." + itemKey + ".display_name");
-
-            if (materialName != null) {
-                Material material = Material.matchMaterial(materialName.toUpperCase());
-                if (material != null) {
-                    ItemStack itemStack = new ItemStack(material);
-                    ItemMeta meta = itemStack.getItemMeta();
-                    if (meta != null) {
-                        meta.setDisplayName(ChatColor.GREEN + (displayName != null ? displayName : "Unnamed Item"));
-                        List<String> lore = new ArrayList<>();
-                        lore.add(ChatColor.GOLD + "Price: $" + price);
-                        meta.setLore(lore);
-                        itemStack.setItemMeta(meta);
-                        items.add(itemStack);
+            boolean locked = config.getBoolean("shop.categories." + category + ".items." + itemKey + ".available");
+            if (!locked) {
+                if (materialName != null) {
+                    Material material = Material.matchMaterial(materialName.toUpperCase());
+                    if (material != null) {
+                        ItemStack itemStack = new ItemStack(material);
+                        ItemMeta meta = itemStack.getItemMeta();
+                        if (meta != null) {
+                            meta.setDisplayName(ChatColor.GREEN + (displayName != null ? displayName : "Unnamed Item"));
+                            List<String> lore = new ArrayList<>();
+                            // Format price with commas
+                            NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+                            String formattedPrice = formatter.format(price);
+                            lore.add(ChatColor.GOLD + "Price: $" + formattedPrice);
+                            meta.setLore(lore);
+                            itemStack.setItemMeta(meta);
+                            items.add(itemStack);
+                        }
                     }
                 }
+                //--non availability logic
             }
         }
 
