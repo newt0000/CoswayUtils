@@ -45,11 +45,13 @@ public class IlluminationWand implements Listener {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
 
+        // Ensure the player is holding the Illumination Wand
         if (item.getType() != Material.CARROT_ON_A_STICK || !item.hasItemMeta() ||
                 !ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals("Illumination Wand")) {
             return;
         }
 
+        // Cooldown check (except in Creative mode)
         if (player.getGameMode() != GameMode.CREATIVE) {
             if (cooldowns.containsKey(player.getUniqueId())) {
                 long lastUse = cooldowns.get(player.getUniqueId());
@@ -61,61 +63,39 @@ public class IlluminationWand implements Listener {
             cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
         }
 
+        // Ray trace to detect block the player is looking at
         RayTraceResult result = player.getWorld().rayTraceBlocks(
                 player.getEyeLocation(), player.getEyeLocation().getDirection(), 20, FluidCollisionMode.NEVER
         );
 
-        if (result == null || result.getHitBlock() == null) {
+        if (result == null || result.getHitBlock() == null || result.getHitBlockFace() == null) {
             player.sendMessage(ChatColor.RED + "You must aim at a block within range!");
             return;
         }
 
-        Block targetBlock = player.getTargetBlockExact(20, FluidCollisionMode.NEVER); // Get the block the player is looking at (within 20 blocks)
+        Block targetBlock = result.getHitBlock(); // Get the exact hit block
+        BlockFace hitFace = result.getHitBlockFace(); // Get the exact hit face
 
-// Ensure a valid block is being targeted
-        if (targetBlock == null || targetBlock.getType() == Material.AIR) {
-            player.sendMessage(ChatColor.RED + "You must look at a solid block to place light!");
-            return;
-        }
-
-// Get the correct face where the block should be placed
-        BlockFace hitFace = event.getBlockFace();
-        if (hitFace == null) {
-            player.sendMessage(ChatColor.RED + "Couldn't determine block face!");
-            return;
-        }
-
-        // Get the exact block where the light should be placed
+        // Get the correct placement location
         Block placeLocation = targetBlock.getRelative(hitFace);
-        Location safeSpot = placeLocation.getLocation();
 
-// Ensure we are not replacing a solid block
+        // Ensure we are not replacing a solid block
         if (!placeLocation.getType().isAir() && placeLocation.getType() != Material.WATER) {
-
-            Block checkUp = placeLocation.getRelative(BlockFace.UP);
-            Block checkDown = placeLocation.getRelative(BlockFace.DOWN);
-
-            if (!checkUp.getType().isAir() && checkUp.getType() != Material.WATER) {
-                if (!checkDown.getType().isAir() && checkDown.getType() != Material.WATER) {
-                    player.sendMessage(ChatColor.RED + "You cannot place a light inside a block!");
-                    return;
-                } else {
-                    safeSpot = checkDown.getLocation();
-                }
-            } else {
-                safeSpot = checkUp.getLocation();
-            }
+            player.sendMessage(ChatColor.RED + "You cannot place a light inside a block!");
+            return;
         }
 
         // Place the light block at the correct location
-        safeSpot.getBlock().setType(Material.LIGHT);
-        Light lightBlock = (Light) safeSpot.getBlock().getBlockData();
+        placeLocation.setType(Material.LIGHT);
+        Light lightBlock = (Light) placeLocation.getBlockData();
         lightBlock.setLevel(15); // Set light level to max
-        safeSpot.getBlock().setBlockData(lightBlock);
+        placeLocation.setBlockData(lightBlock);
 
-        // Particle effect at the placed location
-        player.getWorld().spawnParticle(Particle.END_ROD, safeSpot.add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, 0);
-        player.getWorld().playSound(safeSpot, Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.5f);
+        // Particle and sound effects
+        player.getWorld().spawnParticle(Particle.END_ROD, placeLocation.getLocation().add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, 0);
+        player.getWorld().playSound(placeLocation.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.5f);
 
+        player.sendMessage(ChatColor.GREEN + "Light placed!");
     }
 }
+
