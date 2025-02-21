@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.data.type.LightningRod;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,6 +23,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Entity;
@@ -53,6 +55,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
         // Start the detection loop when the plugin is enabled
         new AnchorShield().startDetectionLoop();
+        registration("Anchor Shield");
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -75,12 +78,17 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(this, 0, 2); // Runs every 10 ticks (0.5 seconds)
+        registration("Wither Contract");
+        registration("Totem Tweaks");
         // Register Gravity Gauntlet
         new GravityGauntlet(this);
+        registration("Gravity Gauntlet");
         // Register TotemShield
         new TotemShield(this);
+        registration("Totem Shield");
         // Register the ShadowStep listener
         new MobLevitationWand(this);
+        registration("Levitation Wand");
         if (!setupEconomy()) {
             getLogger().severe("Vault not found or no economy provider found.");
             getServer().getPluginManager().disablePlugin(this);
@@ -89,7 +97,9 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
 
         new BlockShop(this, economy).register();
         new BlockShop(this, economy);
+        registration("BlockShop");
         new RapidFireBow(this);
+        registration("Rapid Fire Bow");
         getServer().getPluginManager().registerEvents(new RapidFireBow(this), this);
         getServer().getPluginManager().registerEvents(new ShadowStep(this), this);
         //register levitation wand
@@ -102,6 +112,9 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
         this.getCommand("getwand").setExecutor(new GiveWandCommand());
         getServer().getPluginManager().registerEvents(new LaunchStick(this), this);
+        new FireflySimulator(this);
+        registration("FireFlies");
+        //getServer().getPluginManager().registerEvents(new FireflySimulator(this), this);
         new BukkitRunnable() {
 
             @Override
@@ -125,13 +138,14 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                     }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Anchor Shield Kit")) {
                         // Create a chest item
-                        ItemStack anchor = new ItemStack(Material.RESPAWN_ANCHOR, 1);
+                        giveAnchorKit(player);
+                       /* ItemStack anchor = new ItemStack(Material.RESPAWN_ANCHOR, 1);
                         ItemStack rod = new ItemStack(Material.LIGHTNING_ROD, 1);
                         ItemStack core = new ItemStack(Material.HEAVY_CORE, 1);
                         ItemStack charge = new ItemStack(Material.GLOWSTONE,4);
 
                         // Give the chest and items to the player
-                        player.getInventory().addItem(anchor,rod,core,charge);
+                        player.getInventory().addItem(anchor,rod,core,charge);*/
                     }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Levitation Wand")) {
                         player.getInventory().addItem(MobLevitationWand.createWand());
@@ -146,9 +160,15 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             }
         }.runTaskTimer(this,0,2);
         new IlluminationWand(this);
+        registration("Illumination Wand");
+        new BlackholeEffect(this);
+        registration("BlackHole (W.I.P.)");
+
     }
 
-
+    public void registration(String msg) {
+        Bukkit.broadcastMessage(ColorKey("&7[&eRegistrations&7] &aUtility Registered: &6"+msg));
+    }
     private boolean setupEconomy() {
         // Setup Vault economy (make sure it's enabled and available)
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
@@ -260,6 +280,32 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         return false; // No matching book found
     }
 
+    public static void giveAnchorKit(Player player) {
+        // Create a chest item
+        ItemStack chestItem = new ItemStack(Material.CHEST);
+        BlockStateMeta meta = (BlockStateMeta) chestItem.getItemMeta();
+
+        if (meta != null) {
+            // Get the block state as a chest
+            Chest chestState = (Chest) meta.getBlockState();
+            meta.setDisplayName(ChatColor.GOLD+"Anchor Shield Kit");
+            // Get the inventory of the chest
+            Inventory chestInventory = chestState.getInventory();
+
+            // Add items to the chest
+            chestInventory.setItem(0, new ItemStack(Material.RESPAWN_ANCHOR, 1)); // 1 Respawn Anchor in slot 0
+            chestInventory.setItem(1, new ItemStack(Material.LIGHTNING_ROD, 1)); // 1 Lightning Rod in slot 1
+            chestInventory.setItem(2, new ItemStack(Material.HEAVY_CORE, 1)); // 1 Heavy Core in slot 2
+            chestInventory.setItem(3, new ItemStack(Material.GLOWSTONE,4)); // 4 Glowstone in slot 3
+            // Update the block state in the meta
+            chestState.update();
+            meta.setBlockState(chestState);
+            chestItem.setItemMeta(meta);
+        }
+
+        // Give the player the preloaded chest
+        player.getInventory().addItem(chestItem);
+    }
 
     public void serverMessage(String msg) {
         getServer().broadcastMessage(prefix()+ColorKey(msg));
@@ -328,6 +374,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                                 if (state.getBlock().getType() == Material.HEAVY_CORE) {
                                     Location anchorLoc = state.getLocation();
                                     if (isMultiBlock(anchorLoc)) {
+
                                         manageAnchor(anchorLoc);
                                     }
                                 }
@@ -341,7 +388,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         private boolean isMultiBlock(Location loc) {
             return loc.getBlock().getType() == Material.HEAVY_CORE &&
                     loc.clone().add(0, -1, 0).getBlock().getType() == Material.LIGHTNING_ROD &&
-                    loc.clone().add(0, -2, 0).getBlock().getType() == Material.RESPAWN_ANCHOR; // Assuming Heavy Core
+                    loc.clone().add(0, -2, 0).getBlock().getType() == Material.RESPAWN_ANCHOR;
         }
 
         private void manageAnchor(Location loc) {
@@ -359,6 +406,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             marker.setInvulnerable(true);
             marker.setMarker(true);
             debugMessage("Anchor shield created");
+            serverMessage("&6A new anchor shield has been activated at &eX:"+loc.getX()+" Y:"+loc.getY()+" Z:"+loc.getZ());
             marker.getWorld().playEffect(marker.getLocation().subtract(0,2,0),Effect.TRIAL_SPAWNER_BECOME_OMINOUS,1);
             marker.getWorld().playEffect(marker.getLocation().subtract(0,2,0),Effect.SMASH_ATTACK,1);
             marker.getWorld().playSound(marker.getLocation(),Sound.BLOCK_END_PORTAL_SPAWN,100,0);
@@ -532,6 +580,8 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                     } else {
                         removeMarker(loc);
                         debugMessage("removed anchor shield for no fuel");
+                        loc.getBlock().getWorld().spawnParticle(Particle.PORTAL,loc,100);
+                        serverMessage("&cAn Anchor Shield at &eX:"+loc.getX()+" Y:"+loc.getY()+" Z:"+loc.getZ()+" &chas run out of fuel and deactivated!");
                         loc.getBlock().getWorld().playSound(loc,Sound.ITEM_TOTEM_USE,10,0);
                         loc.getBlock().getWorld().playEffect(loc,Effect.ENDER_DRAGON_DEATH,1);
                         cancel();
@@ -563,6 +613,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                                 loc.equals(anchorLoc.clone().add(0, -2, 0))
                 )) {
                     removeMarker(anchorLoc);
+                    serverMessage("&cAn anchor shield has been broken at &eX:"+anchorLoc.getX()+" Y:"+anchorLoc.getY()+" Z:"+anchorLoc.getZ());
                     return;
                 }
             }
