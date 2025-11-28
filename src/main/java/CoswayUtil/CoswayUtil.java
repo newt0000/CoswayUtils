@@ -167,7 +167,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                         player.getInventory().addItem(IlluminationWand.getIlluminationWand());
                     }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Mace Of Storms")) {
-                        ItemStack mace = new ItemStack(Material.NETHERITE_SHOVEL);
+                        ItemStack mace = new ItemStack(Material.MACE);
                         ItemMeta meta = mace.getItemMeta();
                         meta.setDisplayName(ChatColor.DARK_PURPLE + "Mace of Storms");
                         mace.setItemMeta(meta);
@@ -175,7 +175,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                     }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Tracer Bow")) {
                         ItemStack tb = new ItemStack(Material.BOW);
-                        tb.addEnchantment(Enchantment.LOYALTY,1);
+                        tb.addUnsafeEnchantment(Enchantment.LOYALTY,1);
                         player.getInventory().addItem(tb);
                     }
                 }
