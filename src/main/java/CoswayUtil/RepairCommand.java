@@ -15,7 +15,40 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RepairCommand implements CommandExecutor {
+    private boolean isToolOrArmor(Material mat) {
+        if (mat == null) return false;
 
+        String name = mat.name();
+
+        // Tools
+        if (name.endsWith("_PICKAXE") ||
+                name.endsWith("_AXE") ||
+                name.endsWith("_SHOVEL") ||
+                name.endsWith("_HOE") ||
+                name.endsWith("_SWORD") ||
+                name.endsWith("_MACE") ||
+                name.equals("FISHING_ROD") ||
+                name.equals("SHEARS") ||
+                name.equals("BOW") ||
+                name.equals("CROSSBOW") ||
+                name.equals("TRIDENT") ||
+                name.equals("BRUSH") ||
+                name.equals("FLINT_AND_STEEL")) {
+            return true;
+        }
+
+        // Armor
+        if (name.endsWith("_HELMET") ||
+                name.endsWith("_CHESTPLATE") ||
+                name.endsWith("_LEGGINGS") ||
+                name.endsWith("_BOOTS") ||
+                name.equals("SHIELD") ||
+                name.equals("ELYTRA")) {
+            return true;
+        }
+
+        return false;
+    }
     private static final Set<Material> REPAIRABLE_TOOLS = new HashSet<>(Arrays.asList(
             Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE,
             Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE,
@@ -40,8 +73,8 @@ public class RepairCommand implements CommandExecutor {
             return true;
         }
 
-        if (!REPAIRABLE_TOOLS.contains(item.getType())) {
-            player.sendMessage(ChatColor.RED + "That item is not a valid tool!");
+        if (!isToolOrArmor(item.getType())) {
+            player.sendMessage(ChatColor.RED + "That item is not a valid tool or armor!");
             return true;
         }
 
