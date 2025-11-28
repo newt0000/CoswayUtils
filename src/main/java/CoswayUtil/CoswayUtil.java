@@ -1,4 +1,4 @@
-package CoswayUtil;
+//package CoswayUtil;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -25,6 +25,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -51,6 +52,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         // Create or load the configuration file
         saveDefaultConfig();  // This creates the config file if it doesn't exist.
         config = getConfig(); // Get the loaded configuration
+        getServer().getPluginManager().registerEvents(new MaceOfStorms(this), this);
         serverMessage(ColorKey("&aaw sheit here we go again...."));
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
         // Start the detection loop when the plugin is enabled
@@ -164,6 +166,26 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         new BlackholeEffect(this);
         registration("BlackHole (W.I.P.)");
 
+        if (!setupEconomy()) {
+            getLogger().severe("Vault dependency not found! Disabling plugin...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        getCommand("writecheck").setExecutor(new CheckCommand(this, econ));
+        getCommand("cashcheck").setExecutor(new CheckCommand(this, econ));
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+
     }
 
     public void registration(String msg) {
@@ -182,6 +204,13 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         serverMessage(ColorKey("&cim dead, im alive but im dead...."));
     }
     public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String @NotNull [] args) {
+        if(cmd.getName().equalsIgnoreCase("givemace") && sender instanceof Player player) {
+            ItemStack mace = new ItemStack(Material.NETHERITE_SHOVEL);
+            ItemMeta meta = mace.getItemMeta();
+            meta.setDisplayName(ChatColor.DARK_PURPLE + "Mace of Storms");
+            mace.setItemMeta(meta);
+            player.getInventory().addItem(mace);
+        }
         if (cmd.getName().equalsIgnoreCase("scale") && sender instanceof Player player) {
             if (args.length < 1) {
             return false;
@@ -631,4 +660,6 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
 
 
 }
+
+
 

@@ -38,3 +38,9 @@ commands:
     description: "opens block shop"
     usage: "/blockshop"
     permission: CoswayUtil.shop
+  writecheck:
+    description: Writes a check to another player.
+    usage: /writecheck <player> <amount>
+  cashcheck:
+    description: Cash a check you are holding.
+    usage: /cashcheck
