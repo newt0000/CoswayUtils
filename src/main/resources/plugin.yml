@@ -5,6 +5,8 @@ description: "utility plugin for Cosway servers, a yescraft network server"
 api-version: '1.21'
 author: "Newt_00"
 depend: [Vault]
+authors:
+  - Newt_00
 website: "ycs.Newt-Tech.com"
 commands:
   scale:
