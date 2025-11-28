@@ -1,4 +1,4 @@
-//package CoswayUtil;
+package CoswayUtil;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -9,6 +9,7 @@ import org.bukkit.block.data.type.LightningRod;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Monster;
 import org.bukkit.event.EventHandler;
@@ -49,10 +50,21 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
     private FileConfiguration config;
     @Override
     public void onEnable() {
+        registration("unbreakable command listener");
+        getCommand("unbreakable").setExecutor(new UnbreakableCommand());
+        registration("repair command listener");
+        getCommand("repair").setExecutor(new RepairCommand());
+        registration("treasure fountain registration");
+        getServer().getPluginManager().registerEvents(new TreasureFountain(this), this);
+        registration("bow trajectory registration");
+        getServer().getPluginManager().registerEvents(new BowTrajectoryVisualizer(this), this);
+        registration("bow tracer arrow listener");
+        getServer().getPluginManager().registerEvents(new TracerArrowListener(this), this);
+
         // Create or load the configuration file
         saveDefaultConfig();  // This creates the config file if it doesn't exist.
         config = getConfig(); // Get the loaded configuration
-        getServer().getPluginManager().registerEvents(new MaceOfStorms(this), this);
+        new MaceOfStorms(this);
         serverMessage(ColorKey("&aaw sheit here we go again...."));
         Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
         // Start the detection loop when the plugin is enabled
@@ -90,12 +102,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         registration("Totem Shield");
         // Register the ShadowStep listener
         new MobLevitationWand(this);
-        registration("Levitation Wand");
-        if (!setupEconomy()) {
-            getLogger().severe("Vault not found or no economy provider found.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+
 
         new BlockShop(this, economy).register();
         new BlockShop(this, economy);
@@ -139,15 +146,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                         player.getInventory().addItem(LaunchStick.createLaunchStick());
                     }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Anchor Shield Kit")) {
-                        // Create a chest item
                         giveAnchorKit(player);
-                       /* ItemStack anchor = new ItemStack(Material.RESPAWN_ANCHOR, 1);
-                        ItemStack rod = new ItemStack(Material.LIGHTNING_ROD, 1);
-                        ItemStack core = new ItemStack(Material.HEAVY_CORE, 1);
-                        ItemStack charge = new ItemStack(Material.GLOWSTONE,4);
-
-                        // Give the chest and items to the player
-                        player.getInventory().addItem(anchor,rod,core,charge);*/
                     }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Levitation Wand")) {
                         player.getInventory().addItem(MobLevitationWand.createWand());
@@ -157,6 +156,18 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                     }
                     if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Illumination Wand")) {
                         player.getInventory().addItem(IlluminationWand.getIlluminationWand());
+                    }
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Mace Of Storms")) {
+                        ItemStack mace = new ItemStack(Material.NETHERITE_SHOVEL);
+                        ItemMeta meta = mace.getItemMeta();
+                        meta.setDisplayName(ChatColor.DARK_PURPLE + "Mace of Storms");
+                        mace.setItemMeta(meta);
+                        player.getInventory().addItem(mace);
+                    }
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Tracer Bow")) {
+                        ItemStack tb = new ItemStack(Material.BOW);
+                        tb.addEnchantment(Enchantment.LOYALTY,1);
+                        player.getInventory().addItem(tb);
                     }
                 }
             }
@@ -171,34 +182,30 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        getCommand("writecheck").setExecutor(new CheckCommand(this, econ));
-        getCommand("cashcheck").setExecutor(new CheckCommand(this, econ));
+
+        getCommand("writecheck").setExecutor(new CheckCommand(this, economy));
+        getCommand("cashcheck").setExecutor(new CheckCommand(this, economy));
+
     }
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        RegisteredServiceProvider<Economy> rsp =
+                getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             return false;
         }
-        econ = rsp.getProvider();
-        return econ != null;
-
+        economy = rsp.getProvider();
+        return economy != null;
     }
+
 
     public void registration(String msg) {
         Bukkit.broadcastMessage(ColorKey("&7[&eRegistrations&7] &aUtility Registered: &6"+msg));
     }
-    private boolean setupEconomy() {
-        // Setup Vault economy (make sure it's enabled and available)
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
-            economy = getServer().getServicesManager().getRegistration(Economy.class).getProvider();
-            return economy != null;
-        }
-        return false;
-    }
+
     @Override
     public void onDisable() {
         serverMessage(ColorKey("&cim dead, im alive but im dead...."));

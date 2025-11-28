@@ -44,3 +44,11 @@ commands:
   cashcheck:
     description: Cash a check you are holding.
     usage: /cashcheck
+  unbreakable:
+    description: Make the held tool unbreakable
+    usage: /unbreakable
+    permission: coswayutil.unbreakable
+  repair:
+    description: Repair the held tool
+    usage: /repair
+    permission: coswayutil.repair

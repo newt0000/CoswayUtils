@@ -1,5 +1,5 @@
 //in MaceOfStorms.java
-package CoswayUtil.items;
+package CoswayUtil;
 
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -60,6 +60,20 @@ public class MaceOfStorms implements Listener {
             }
         }.runTaskTimer(plugin, 0, 2);
     }
+    private void spawnImpactParticles(Location location) {
+        for (int i = 0; i < 20; i++) {
+            double angle = Math.toRadians((360.0 / 20) * i);
+            double offsetX = Math.cos(angle) * 1.5;
+            double offsetZ = Math.sin(angle) * 1.5;
+
+            location.getWorld().spawnParticle(
+                    Particle.CRIT,
+                    location.clone().add(offsetX, 0.5, offsetZ),
+                    1,
+                    0, 0, 0, 0
+            );
+        }
+    }
 
     private boolean isMaceOfStorms(ItemStack item) {
         if (item == null || item.getType() != Material.NETHERITE_SHOVEL) { // Mace-like weapon
@@ -97,7 +111,7 @@ public class MaceOfStorms implements Listener {
         for (int i = 0; i < 6; i++) { // 6 particles around the entity
             double offsetX = Math.cos(angle + (i * Math.PI / 3)) * 1.5;
             double offsetZ = Math.sin(angle + (i * Math.PI / 3)) * 1.5;
-            location.getWorld().spawnParticle(Particle.CRIT_MAGIC, location.clone().add(offsetX, 0.5, offsetZ), 1, 0, 0, 0, 0);
+            spawnImpactParticles( location.clone().add(offsetX, 0.5, offsetZ));
         }
     }
 }

@@ -1,5 +1,5 @@
 name: CoswayUtil
-version: '1.12-RELEASE'
+version: '1.15-BETA'
 main: CoswayUtil.CoswayUtil
 description: "utility plugin for Cosway servers, a yescraft network server"
 api-version: '1.21'
@@ -38,3 +38,17 @@ commands:
     description: "opens block shop"
     usage: "/blockshop"
     permission: CoswayUtil.shop
+  writecheck:
+    description: Writes a check to another player.
+    usage: /writecheck <player> <amount>
+  cashcheck:
+    description: Cash a check you are holding.
+    usage: /cashcheck
+  unbreakable:
+    description: Make the held tool unbreakable
+    usage: /unbreakable
+    permission: coswayutil.unbreakable
+  repair:
+    description: Repair the held tool
+    usage: /repair
+    permission: coswayutil.repair

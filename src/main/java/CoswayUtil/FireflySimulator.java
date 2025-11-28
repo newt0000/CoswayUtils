@@ -74,7 +74,7 @@ public class FireflySimulator {
             double offsetY = random.nextDouble() * 3 + 1; // Fireflies hover slightly above the ground
 
             Location fireflyLocation = playerLocation.clone().add(offsetX, offsetY, offsetZ);
-            player.getWorld().spawnParticle(Particle.END_ROD, fireflyLocation, 0, 0, 0.01, 0, 1); // Small movement effect
+            player.getWorld().spawnParticle(Particle.FIREFLY, fireflyLocation, 0, 0, 0.01, 0, 1); // Small movement effect
         }
     }
 }
