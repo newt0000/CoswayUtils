@@ -17,48 +17,88 @@ public class CoswayPDCCommand implements CommandExecutor {
             @NotNull String label,
             @NotNull String[] args
     ) {
-        if (!cmd.getName().equalsIgnoreCase("coswaysetpdc")) {
-            return false; // Not our command
+        String command = cmd.getName().toLowerCase();
+
+        switch (command) {
+
+            // -------------------------------------------------------------------
+            //  /coswaysetpdc  <@s|player> <key> <value>
+            // -------------------------------------------------------------------
+            case "coswaysetpdc" -> {
+
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage(ChatColor.RED + "Only players may use this.");
+                    return true;
+                }
+
+                if (args.length < 3) {
+                    player.sendMessage(ChatColor.RED + "Usage: /coswaysetpdc <@s|player> <key> <value>");
+                    return true;
+                }
+
+                // Resolve target
+                Player target;
+                if (args[0].equalsIgnoreCase("@s")) {
+                    target = player;
+                } else {
+                    target = Bukkit.getPlayerExact(args[0]);
+                }
+
+                if (target == null) {
+                    player.sendMessage(ChatColor.RED + "Invalid target player!");
+                    return true;
+                }
+
+                String key = args[1];
+                String newValue = args[2];
+
+                String oldValue = PDCUtil.getString(target, key);
+                if (oldValue == null) oldValue = "&cNULL";
+
+                PDCUtil.setString(target, key, newValue);
+
+                String msg = "&aSet &e" + key + "&a from &6" + oldValue + "&a to &b" + newValue +
+                        " &afor player &e" + target.getName();
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+
+                return true;
+            }
+
+            // -------------------------------------------------------------------
+            //  /coswaygetpdc  <player> <key>
+            // -------------------------------------------------------------------
+            case "coswaygetpdc" -> {
+
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage(ChatColor.RED + "Only players may use this.");
+                    return true;
+                }
+
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Usage: /coswaygetpdc <player> <key>");
+                    return true;
+                }
+
+                Player target = Bukkit.getPlayerExact(args[0]);
+                if (target == null) {
+                    player.sendMessage(ChatColor.RED + "Player not found!");
+                    return true;
+                }
+
+                String key = args[1];
+                String value = PDCUtil.getString(target, key);
+
+                if (value == null) value = ChatColor.RED + "NULL";
+
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        "&aPDC for player &e" + target.getName() +
+                                "&a key &e" + key +
+                                "&a is set to: &b" + value));
+
+                return true;
+            }
         }
 
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
-            return true;
-        }
-
-        if (args.length < 3) {
-            player.sendMessage(ChatColor.RED + "Usage: /coswaysetpdc <@s|player> <key> <value>");
-            return true;
-        }
-
-        // Target resolution
-        Player target;
-        if (args[0].equalsIgnoreCase("@s")) {
-            target = player;
-        } else {
-            target = Bukkit.getPlayerExact(args[0]);
-        }
-
-        if (target == null) {
-            player.sendMessage(ChatColor.RED + "Invalid target player!");
-            return true;
-        }
-
-        String key = args[1];
-        String newValue = args[2]; // single-arg value like your original
-
-        // Get old value
-        String oldValue = PDCUtil.getString(target, key);
-        if (oldValue == null) {
-            oldValue = "&cNULL";
-        }
-
-        // Set new value
-        PDCUtil.setString(target, key, newValue);
-
-        String msg = "&aSet " + key + " from " + oldValue + " to " + newValue + " for " + target.getName();
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
-
-        return true;
+        return false; // Unknown command
     }
 }
