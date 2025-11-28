@@ -6,6 +6,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Objects;
 import java.util.Random;
 
 public class FireflySimulator {
@@ -26,12 +28,16 @@ public class FireflySimulator {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getWorld().getTime() == 13000) { // Only at night
                         player.stopAllSounds();
-                        player.playSound(player.getLocation().clone().add(0,100,0), Sound.MUSIC_DISC_MALL,10,1);
+                        if(Objects.equals(PDCUtil.getString(player,"music"),"true")) {
+                            player.playSound(player.getLocation().clone().add(0, 100, 0), Sound.MUSIC_DISC_MALL, 10, 1);
+                        }
                         statMsg(player,"&6time for bed");
                     }
                     if (player.getWorld().getTime() == 1137) { // Only at night
                         player.stopAllSounds();
-                        player.playSound(player.getLocation().clone().add(0,100,0), Sound.MUSIC_DISC_OTHERSIDE,10,1);
+                        if(Objects.equals(PDCUtil.getString(player,"music"),"true")) {
+                            player.playSound(player.getLocation().clone().add(0, 100, 0), Sound.MUSIC_DISC_OTHERSIDE, 10, 1);
+                        }
                         statMsg(player,"&eRize and Shine!");
                     }
                 }
