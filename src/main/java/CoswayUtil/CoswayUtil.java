@@ -50,6 +50,15 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
     private FileConfiguration config;
     @Override
     public void onEnable() {
+        if (!setupEconomy()) {
+            getLogger().severe("Vault dependency not found! Disabling plugin...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        PDCUtil.init(this);
+        getCommand("coswaysetpdc").setExecutor(new CoswayPDCCommand());
+        getCommand("writecheck").setExecutor(new CheckCommand(this, economy));
+        getCommand("cashcheck").setExecutor(new CheckCommand(this, economy));
         registration("unbreakable command listener");
         getCommand("unbreakable").setExecutor(new UnbreakableCommand());
         registration("repair command listener");
@@ -177,14 +186,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         new BlackholeEffect(this);
         registration("BlackHole (W.I.P.)");
 
-        if (!setupEconomy()) {
-            getLogger().severe("Vault dependency not found! Disabling plugin...");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
 
-        getCommand("writecheck").setExecutor(new CheckCommand(this, economy));
-        getCommand("cashcheck").setExecutor(new CheckCommand(this, economy));
 
     }
 

@@ -52,3 +52,8 @@ commands:
     description: Repair the held tool
     usage: /repair
     permission: coswayutil.repair
+  coswaysetpdc:
+    description: Set a PDC string on a player
+    usage: /coswaysetpdc <@s|player> <key> <value>
+    permission: coswayutil.pdc.set
+    permission-message: "&cYou don't have permission to use this."
