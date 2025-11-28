@@ -64,3 +64,8 @@ commands:
     usage: /coswaygetpdc <@s|player> <key>
     permission: coswayutil.pdc.get
     permission-message: "&cYou don't have permission to use this."
+  givetreasurefountain:
+    description: give player treasure fountain item
+    usage: /givetreasurefountain
+    permission: coswayutil.admin
+    permission-message: "&cYou don't have permission to use this."

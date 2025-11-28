@@ -220,6 +220,9 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             mace.setItemMeta(meta);
             player.getInventory().addItem(mace);
         }
+        if (cmd.getName().equalsIgnoreCase("givetreasurefountain") && sender instanceof Player player) {
+            player.getInventory().addItem(TreasureFountain.getTreasureFountainItem());
+        }
         if (cmd.getName().equalsIgnoreCase("scale") && sender instanceof Player player) {
             if (args.length < 1) {
             return false;
