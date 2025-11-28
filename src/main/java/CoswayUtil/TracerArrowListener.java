@@ -7,10 +7,13 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -27,11 +30,13 @@ public class TracerArrowListener implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
+    // When arrow is shot
     @EventHandler
     public void onArrowShoot(ProjectileLaunchEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
 
+        // Require LOYALTY on the bow (your design)
         if (!player.getInventory().getItemInMainHand().containsEnchantment(Enchantment.LOYALTY)) {
             return;
         }
@@ -44,7 +49,7 @@ public class TracerArrowListener implements Listener {
                     return;
                 }
 
-                LivingEntity target = getNearestEntity(arrow);
+                LivingEntity target = getNearestHostile(arrow);
                 if (target == null) return;
 
                 Vector newVel = target.getLocation().toVector()
@@ -59,12 +64,40 @@ public class TracerArrowListener implements Listener {
         }.runTaskTimer(plugin, 5L, 2L);
     }
 
-    private LivingEntity getNearestEntity(Arrow arrow) {
+    // Only target hostile mobs (Monsters)
+    private LivingEntity getNearestHostile(Arrow arrow) {
         List<Entity> entities = arrow.getNearbyEntities(25, 25, 25);
         return entities.stream()
-                .filter(e -> e instanceof LivingEntity && !(e instanceof Player))
+                .filter(e -> e instanceof Monster)                   // hostile only
                 .map(e -> (LivingEntity) e)
-                .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(arrow.getLocation())))
+                .min(Comparator.comparingDouble(
+                        e -> e.getLocation().distanceSquared(arrow.getLocation())
+                ))
                 .orElse(null);
+    }
+
+    // When player switches hotbar slot (puts bow away)
+    @EventHandler
+    public void onHotbarChange(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+
+        // Item they are switching FROM
+        int previousSlot = event.getPreviousSlot();
+        ItemStack oldItem = player.getInventory().getItem(previousSlot);
+
+        // Only act if they were holding a loyalty bow
+        if (oldItem == null
+                || oldItem.getType() != org.bukkit.Material.BOW
+                || !oldItem.containsEnchantment(Enchantment.LOYALTY)) {
+            return;
+        }
+
+        // Kill all arrows in 150 block radius around player
+        double radius = 150.0;
+        for (Entity entity : player.getNearbyEntities(radius, radius, radius)) {
+            if (entity instanceof Arrow arrow) {
+                arrow.remove();
+            }
+        }
     }
 }
