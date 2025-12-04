@@ -1,5 +1,5 @@
 name: CoswayUtil
-version: '1.15-BETA'
+version: '1.15.3'
 main: CoswayUtil.CoswayUtil
 description: "utility plugin for Cosway servers, a yescraft network server"
 api-version: '1.21'
@@ -69,3 +69,7 @@ commands:
     usage: /givetreasurefountain
     permission: coswayutil.admin
     permission-message: "&cYou don't have permission to use this."
+  shockwavebow:
+    description: Give yourself the Shockwave Bow
+    usage: /shockwavebow
+    permission: coswayutil.op

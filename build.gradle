@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.newt-tech'
-version = '1.15-BETA'
+version = '1.15.3'
 
 repositories {
     mavenCentral()

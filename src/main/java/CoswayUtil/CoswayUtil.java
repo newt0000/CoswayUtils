@@ -69,7 +69,11 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new BowTrajectoryVisualizer(this), this);
         registration("bow tracer arrow listener");
         getServer().getPluginManager().registerEvents(new TracerArrowListener(this), this);
-
+        registration("corruption shockwave animator registered");
+        registration("showckwave bow registration");
+        ShockwaveBow shockwaveBow = new ShockwaveBow(this);
+        getServer().getPluginManager().registerEvents(shockwaveBow, this);
+        getCommand("shockwavebow").setExecutor(shockwaveBow);
         // Create or load the configuration file
         saveDefaultConfig();  // This creates the config file if it doesn't exist.
         config = getConfig(); // Get the loaded configuration
