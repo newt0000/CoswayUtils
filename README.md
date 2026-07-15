@@ -1,6 +1,6 @@
 # CoswayUtil
-<img src="http://newt-tech.com/index.html/images/yescraft.png">
-a utility plugin for cosway servers, a yescraft network server
+<img src="http://ycs.newt-tech.com/images/ntlogot.png">
+a utility plugin for Newt-Tech servers, a yescraft network server
 <hr>
 <ul>
 <li>Commands</li>
