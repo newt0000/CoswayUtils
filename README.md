@@ -1,7 +1,7 @@
 # CoswayUtil
 <img src="http://ycs.newt-tech.com/images/ntlogot.png">
 a utility plugin for Newt-Tech servers, a yescraft network server
-<hr>
+<hr/>
 <ul>
 <li>Commands</li>
     <ul>
@@ -89,7 +89,7 @@ shop:
           material: GUNPOWDER
           price: 50
           quantity: 32
-          display_name: “Boom Dust”
+          display_name: "Boom Dust"
           available: true
         netherite:
           material: NETHERITE_INGOT
