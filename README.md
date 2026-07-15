@@ -28,8 +28,10 @@ a utility plugin for Newt-Tech servers, a yescraft network server
 
 <h3>new revamped reward system include incrimentals for xp levels, skill level, enchants, capped damage, armor and more</h3>
 
-
 <h2>Config.yml</h2>
+
+<p>Example configuration:</p>
+
 ```yaml
 # config.yml
 
