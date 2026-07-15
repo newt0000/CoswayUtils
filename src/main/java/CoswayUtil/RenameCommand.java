@@ -6,13 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class UnbreakableCommand implements CommandExecutor {
+public class RenameCommand implements CommandExecutor {
 
 
     private final CoswayUtil plugin;
 
 
-    public UnbreakableCommand(CoswayUtil plugin) {
+    public RenameCommand(CoswayUtil plugin) {
         this.plugin = plugin;
     }
 
@@ -39,11 +39,23 @@ public class UnbreakableCommand implements CommandExecutor {
 
 
 
-        if (!player.hasPermission("coswayutil.unbreakable")) {
+        if (!player.hasPermission("coswayutil.rename")) {
 
             player.sendMessage(
                     ChatColor.RED +
                             "You do not have permission."
+            );
+
+            return true;
+        }
+
+
+
+        if (args.length == 0) {
+
+            player.sendMessage(
+                    ChatColor.YELLOW +
+                            "Usage: /rename <name>"
             );
 
             return true;
@@ -80,34 +92,31 @@ public class UnbreakableCommand implements CommandExecutor {
 
 
 
-
-        if (meta.isUnbreakable()) {
-
-
-            meta.setUnbreakable(false);
-
-            item.setItemMeta(meta);
+        String name =
+                String.join(" ", args);
 
 
-            player.sendMessage(
-                    ChatColor.YELLOW +
-                            "Unbreakable removed from item."
-            );
+
+        name =
+                ChatColor.translateAlternateColorCodes(
+                        '&',
+                        name
+                );
 
 
-        } else {
+
+        meta.setDisplayName(name);
 
 
-            meta.setUnbreakable(true);
-
-            item.setItemMeta(meta);
+        item.setItemMeta(meta);
 
 
-            player.sendMessage(
-                    ChatColor.GREEN +
-                            "Item is now unbreakable."
-            );
-        }
+
+        player.sendMessage(
+                ChatColor.GREEN +
+                        "Item renamed to: " +
+                        name
+        );
 
 
         return true;

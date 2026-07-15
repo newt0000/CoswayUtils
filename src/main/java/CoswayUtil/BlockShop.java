@@ -174,7 +174,7 @@ public class BlockShop implements Listener {
                     // Format price with commas
                     NumberFormat formatter = NumberFormat.getInstance(Locale.US);
                     String formattedPrice = formatter.format(price);
-                    player.sendMessage(ChatColor.RED + getConfigLine("poor", "You don't have enough money to buy this. for "+formattedPrice));
+                    player.sendMessage(ChatColor.RED + getConfigLine("poor", "You don't have enough money to buy this. for "+formattedPrice).replace("%price%", formattedPrice));
                     return;
                 }
 
@@ -240,25 +240,123 @@ public class BlockShop implements Listener {
 
     // Helper method to retrieve the price of an item (can be customized to use a config file for prices)
     private double getPrice(ItemStack item) {
-        for (String category : config.getConfigurationSection("shop.categories").getKeys(false)) {
-            ConfigurationSection itemsSection = config.getConfigurationSection("shop.categories." + category + ".items");
-            if (itemsSection != null) {
-                for (String itemKey : itemsSection.getKeys(false)) {
-                    // Retrieve the material from the config
-                    String materialName = config.getString("shop.categories." + category + ".items." + itemKey + ".material");
-                    if (materialName != null && item.getType() == Material.matchMaterial(materialName.toUpperCase())) {
-                        // Retrieve the display name from the config
-                        String displayName = config.getString("shop.categories." + category + ".items." + itemKey + ".display_name");
 
-                        // Compare the display name in the config with the one on the item
-                        if (displayName != null && displayName != null && displayName.equals(displayName)) {
-                            return config.getDouble("shop.categories." + category + ".items." + itemKey + ".price", 0);
-                        }
-                    }
+        ConfigurationSection categories =
+                config.getConfigurationSection("shop.categories");
+
+
+        if(categories == null) {
+            return 1000000000;
+        }
+
+
+
+        ItemMeta itemMeta =
+                item.getItemMeta();
+
+
+
+        String itemName = null;
+
+
+        if(itemMeta != null && itemMeta.hasDisplayName()) {
+
+            itemName =
+                    ChatColor.stripColor(
+                            itemMeta.getDisplayName()
+                    );
+        }
+
+
+
+
+
+        for(String category : categories.getKeys(false)) {
+
+
+            ConfigurationSection itemsSection =
+                    categories.getConfigurationSection(
+                            category + ".items"
+                    );
+
+
+            if(itemsSection == null)
+                continue;
+
+
+
+            for(String itemKey : itemsSection.getKeys(false)) {
+
+
+                ConfigurationSection section =
+                        itemsSection.getConfigurationSection(
+                                itemKey
+                        );
+
+
+                if(section == null)
+                    continue;
+
+
+
+                String materialName =
+                        section.getString(
+                                "material"
+                        );
+
+
+
+                Material material =
+                        Material.matchMaterial(
+                                materialName.toUpperCase()
+                        );
+
+
+
+                if(material == null)
+                    continue;
+
+
+
+                if(item.getType() != material)
+                    continue;
+
+
+
+
+                String configName =
+                        section.getString(
+                                "display_name"
+                        );
+
+
+
+                /*
+                 * Check display name as well
+                 * because multiple items can share
+                 * the same material
+                 */
+
+                if(itemName != null &&
+                        configName != null &&
+                        !itemName.equals(configName)) {
+
+                    continue;
                 }
+
+
+
+
+                return section.getDouble(
+                        "price",
+                        0
+                );
             }
         }
-        return 1000000000; // Default to 1t if no price is found
+
+
+
+        return 1000000000;
     }
 
 

@@ -27,6 +27,7 @@ public class RepairCommand implements CommandExecutor {
                 name.endsWith("_HOE") ||
                 name.endsWith("_SWORD") ||
                 name.endsWith("_MACE") ||
+                name.equals("MACE") ||
                 name.equals("FISHING_ROD") ||
                 name.equals("SHEARS") ||
                 name.equals("BOW") ||
@@ -55,7 +56,7 @@ public class RepairCommand implements CommandExecutor {
             Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL,
             Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD,
             Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE,
-            Material.FISHING_ROD, Material.SHEARS, Material.BOW, Material.CROSSBOW, Material.TRIDENT
+            Material.FISHING_ROD, Material.SHEARS, Material.BOW, Material.CROSSBOW, Material.TRIDENT, Material.MACE
     ));
 
     @Override

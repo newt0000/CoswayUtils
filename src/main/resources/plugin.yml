@@ -9,6 +9,10 @@ authors:
   - Newt_00
 website: "ycs.Newt-Tech.com"
 commands:
+  mage:
+    description: Unsafe enchantment command
+    usage: /mage <enchantment> <level>
+    permission: coswayutil.mage
   scale:
     permission: cosway.scale
     usage: "/scale <float>"
@@ -73,3 +77,27 @@ commands:
     description: Give yourself the Shockwave Bow
     usage: /shockwavebow
     permission: coswayutil.op
+  tpp:
+    description: Teleport one player to another player
+    usage: /tpp <player> <to player>
+    permission: coswayutil.tpp
+  rename:
+    description: Rename held item
+    usage: /rename <name>
+    permission: coswayutil.rename
+  coswayreload:
+    description: Reload CoswayUtil configuration
+    usage: /coswayreload
+    permission: coswayutil.reload
+permissions:
+  coswayutil.mage:
+    default: op
+  coswayutil.tpp:
+    default: op
+  coswayutil.seen:
+    description: Gives glowing effect
+    default: op
+  coswayutil.rename:
+    default: op
+  coswayutil.reload:
+    default: op

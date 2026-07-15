@@ -214,6 +214,24 @@ shop:
           display_name: "Gravity Gauntlet"
           available: true
           tool_id: 2
+    utils8:
+      items:
+        wither_skull_wand:
+          material: KNOWLEDGE_BOOK
+          price: 1500000
+          quantity: 1
+          display_name: "Wither Skull Cannon"
+          available: true
+          tool_id: 9
+    utils9:
+      items:
+        missile_wand:
+          material: KNOWLEDGE_BOOK
+          price: 1230000
+          quantity: 1
+          display_name: "Seeking Missile Launcher"
+          available: true
+          tool_id: 10
     utils2:
       items:
         levitation_wand:
@@ -281,3 +299,105 @@ poor: "you're too poor for that, get gooder..."
 inventory_full: "you got too much clutter, cant fit your purchase into that mess..."
 pagination:
   max_items_per_page: 45  # Max items to display per page
+economy-rewards:
+
+  enabled: true
+
+  base:
+    reward-per-heart: 2.5
+
+  messages:
+    enabled: true
+    buffer-time: 40
+    reward: "&aRewarded $%amount% for killing &e%count% %entity%'s"
+
+  modifiers:
+
+    damage:
+      enabled: true
+      percent-per-heart: 2.0
+
+    experience:
+      enabled: true
+      percent-per-level: 1.0
+
+    critical-hit:
+      enabled: true
+      percent: 10
+
+    sprint-hit:
+      enabled: true
+      percent: 5
+
+    projectile:
+      enabled: true
+      percent: 5
+
+    fire-aspect:
+      enabled: true
+      percent: 2
+
+    looting:
+      enabled: true
+      percent-per-level: 2
+
+    baby-mobs:
+      enabled: true
+      percent: 15
+
+    named-mobs:
+      enabled: true
+      percent: 20
+
+    night:
+      enabled: true
+      percent: 5
+
+    rain:
+      enabled: true
+      percent: 3
+
+  blacklist:
+    - ARMOR_STAND
+    - ITEM_FRAME
+wither-skull-launcher:
+  explosion-power: 50.0
+heat-seeking-missile:
+
+  targets:
+    enabled: true
+    entities:
+      - ZOMBIE
+      - SKELETON
+      - CREEPER
+      - SPIDER
+      - ENDERMAN
+      - PLAYER
+
+  tracking:
+    range: 30
+    max-life-ticks: 600
+    speed: 1.7
+    steering-strength: 0.45
+    # How many ticks before forcing a new target search
+    retarget-delay: 20
+    # How many ticks before assuming missile is stuck
+    stuck-check-delay: 10
+    # Velocity boost when stuck
+    recovery-boost: 1.2
+    water-recovery-delay: 20
+    water-recovery-boost: 3.0
+
+
+  explosion:
+    entity-damage: 20
+
+    # Enables actual explosion damage and terrain destruction
+    fiery-explosion:
+      enabled: true
+
+    power: 8
+
+    # Creates a rainbow firework visual burst
+    rainbow-firework:
+      enabled: true
