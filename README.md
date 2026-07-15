@@ -31,6 +31,7 @@ a utility plugin for Newt-Tech servers, a yescraft network server
 
 <h2>Config.yml</h2>
 ```yaml
+
 shop:
   categories:
     stone_blocks:
