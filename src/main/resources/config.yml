@@ -401,3 +401,41 @@ heat-seeking-missile:
     # Creates a rainbow firework visual burst
     rainbow-firework:
       enabled: true
+innocents:
+
+  messages:
+    jailed: "&cYou killed an innocent &e%victim%&c! &r| &6&lFine: &e$%fine% &r| &6&lJail time: &e%time%"
+
+
+  wolf:
+
+    fine: 123.45
+
+    time: 1h2m3s
+
+
+  villager:
+
+    fine: 500
+
+    time: 3m
+
+
+  cat:
+
+    fine: 250
+
+    time: 10m
+
+
+  horse:
+
+    fine: 1000
+
+    time: 5m
+
+  fox:
+
+    fine: 1000000000
+
+    time: 30m

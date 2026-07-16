@@ -89,6 +89,12 @@ commands:
     description: Reload CoswayUtil configuration
     usage: /coswayreload
     permission: coswayutil.reload
+  jail:
+    description: Manually jail a player
+    usage: /jail <player> <fine> <time>
+  unjail:
+    description: Release a player from jail
+    usage: /unjail <player>
 permissions:
   coswayutil.mage:
     default: op
@@ -100,4 +106,8 @@ permissions:
   coswayutil.rename:
     default: op
   coswayutil.reload:
+    default: op
+  coswayutil.jail:
+    default: op
+  coswayutil.unjail:
     default: op

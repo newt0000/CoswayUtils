@@ -48,6 +48,11 @@ import java.util.Map;
 public final class CoswayUtil extends JavaPlugin implements Listener {
     private Economy economy;
     private FileConfiguration config;
+    private WitherSkullWand skullWand;
+
+    public Economy getEconomy() {
+        return economy;
+    }
     @Override
     public void onEnable() {
         if (!setupEconomy()) {
@@ -55,143 +60,175 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        saveDefaultConfig();
+        config = getConfig();
+
         PDCUtil.init(this);
+
+        skullWand = new WitherSkullWand(this);
+        getServer().getPluginManager().registerEvents(skullWand,this);
+        registration("Wither Skull Launcher");
+
+        InnocentMobJail jail = new InnocentMobJail(this,economy);
+        getServer().getPluginManager().registerEvents(jail,this);
+        getCommand("jail").setExecutor(jail);
+        getCommand("unjail").setExecutor(jail);
+        registration("Innocent Mob Jail");
+
         getCommand("coswaysetpdc").setExecutor(new CoswayPDCCommand());
-        getCommand("writecheck").setExecutor(new CheckCommand(this, economy));
-        getCommand("cashcheck").setExecutor(new CheckCommand(this, economy));
-        registration("unbreakable command listener");
-        getCommand("unbreakable").setExecutor(new UnbreakableCommand());
-        registration("repair command listener");
+        getCommand("writecheck").setExecutor(new CheckCommand(this,economy));
+        getCommand("cashcheck").setExecutor(new CheckCommand(this,economy));
+
+        ReloadCommand reloadCommand = new ReloadCommand(this);
+        getCommand("coswayreload").setExecutor(reloadCommand);
+
+        MageCommand mageCommand = new MageCommand(this);
+        getCommand("mage").setExecutor(mageCommand);
+        getCommand("mage").setTabCompleter(mageCommand);
+
+        RenameCommand rename = new RenameCommand(this);
+        getCommand("rename").setExecutor(rename);
+
+        TPPCommand tpp = new TPPCommand(this);
+        getCommand("tpp").setExecutor(tpp);
+        getCommand("tpp").setTabCompleter(tpp);
+
+        getCommand("unbreakable").setExecutor(new UnbreakableCommand(this));
         getCommand("repair").setExecutor(new RepairCommand());
-        registration("treasure fountain registration");
-        getServer().getPluginManager().registerEvents(new TreasureFountain(this), this);
-        registration("bow trajectory registration");
-        getServer().getPluginManager().registerEvents(new BowTrajectoryVisualizer(this), this);
-        registration("bow tracer arrow listener");
-        getServer().getPluginManager().registerEvents(new TracerArrowListener(this), this);
-        registration("corruption shockwave animator registered");
-        registration("showckwave bow registration");
+
+        HeatSeekingMissile missile = new HeatSeekingMissile(this);
+        getServer().getPluginManager().registerEvents(missile,this);
+
+
+        TreasureFountain treasure = new TreasureFountain(this);
+        getServer().getPluginManager().registerEvents(treasure,this);
+
+        getServer().getPluginManager().registerEvents(new BowTrajectoryVisualizer(this),this);
+        getServer().getPluginManager().registerEvents(new TracerArrowListener(this),this);
+
         ShockwaveBow shockwaveBow = new ShockwaveBow(this);
-        getServer().getPluginManager().registerEvents(shockwaveBow, this);
+        getServer().getPluginManager().registerEvents(shockwaveBow,this);
         getCommand("shockwavebow").setExecutor(shockwaveBow);
-        // Create or load the configuration file
-        saveDefaultConfig();  // This creates the config file if it doesn't exist.
-        config = getConfig(); // Get the loaded configuration
+
         new MaceOfStorms(this);
-        serverMessage(ColorKey("&aaw sheit here we go again...."));
-        Bukkit.getPluginManager().registerEvents(new AnchorShield(), this);
-        // Start the detection loop when the plugin is enabled
-        new AnchorShield().startDetectionLoop();
-        registration("Anchor Shield");
-        new BukkitRunnable() {
+
+        AnchorShield shield = new AnchorShield();
+        getServer().getPluginManager().registerEvents(shield,this);
+        shield.startDetectionLoop();
+
+        new BukkitRunnable(){
             @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (player.hasPotionEffect(PotionEffectType.RESISTANCE)) {
-                        Location center = player.getLocation().add(0, 1, 0); // Center around player's head
-                        double radius = 1.5; // Radius of the sphere
+            public void run(){
+                for(Player player:Bukkit.getOnlinePlayers()){
+                    if(player.hasPotionEffect(PotionEffectType.RESISTANCE)){
+                        Location center=player.getLocation().add(0,1,0);
 
-                        for (double theta = 0; theta < Math.PI * 2; theta += Math.PI / 8) { // Horizontal rotation
-                            for (double phi = 0; phi < Math.PI; phi += Math.PI / 8) { // Vertical rotation
-                                double x = radius * Math.sin(phi) * Math.cos(theta);
-                                double y = radius * Math.cos(phi);
-                                double z = radius * Math.sin(phi) * Math.sin(theta);
+                        for(double theta=0;theta<Math.PI*2;theta+=Math.PI/8){
+                            for(double phi=0;phi<Math.PI;phi+=Math.PI/8){
 
-                                Location particleLoc = center.clone().add(x, y, z);
-                                player.getWorld().spawnParticle(Particle.DUST, particleLoc, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.AQUA, 0.5F));
+                                double x=1.5*Math.sin(phi)*Math.cos(theta);
+                                double y=1.5*Math.cos(phi);
+                                double z=1.5*Math.sin(phi)*Math.sin(theta);
+
+                                player.getWorld().spawnParticle(
+                                        Particle.DUST,
+                                        center.clone().add(x,y,z),
+                                        1,
+                                        0,0,0,
+                                        0,
+                                        new Particle.DustOptions(Color.AQUA,0.5F)
+                                );
                             }
                         }
                     }
                 }
             }
-        }.runTaskTimer(this, 0, 2); // Runs every 10 ticks (0.5 seconds)
-        registration("Wither Contract");
-        registration("Totem Tweaks");
-        // Register Gravity Gauntlet
+        }.runTaskTimer(this,0,2);
+
         new GravityGauntlet(this);
-        registration("Gravity Gauntlet");
-        // Register TotemShield
         new TotemShield(this);
-        registration("Totem Shield");
-        // Register the ShadowStep listener
-        new MobLevitationWand(this);
 
+        MobLevitationWand levitation = new MobLevitationWand(this);
+        getServer().getPluginManager().registerEvents(levitation,this);
 
-        new BlockShop(this, economy).register();
-        new BlockShop(this, economy);
-        registration("BlockShop");
-        new RapidFireBow(this);
-        registration("Rapid Fire Bow");
-        getServer().getPluginManager().registerEvents(new RapidFireBow(this), this);
-        getServer().getPluginManager().registerEvents(new ShadowStep(this), this);
-        //register levitation wand
-        Bukkit.getPluginManager().registerEvents(new MobLevitationWand(this), this);
-        // Register the PhantomDodge listener
-        getServer().getPluginManager().registerEvents(new PhantomDodge(this), this);
-        // Register the WitherContract listener
-        getServer().getPluginManager().registerEvents(new WitherContract(this), this);
-        // Register commands
-        this.getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
-        this.getCommand("getwand").setExecutor(new GiveWandCommand());
-        getServer().getPluginManager().registerEvents(new LaunchStick(this), this);
+        EconomyRewards rewards = new EconomyRewards(this);
+        getServer().getPluginManager().registerEvents(rewards,this);
+
+        new BlockShop(this,economy).register();
+
+        RapidFireBow rapid = new RapidFireBow(this);
+        getServer().getPluginManager().registerEvents(rapid,this);
+
+        getServer().getPluginManager().registerEvents(new ShadowStep(this),this);
+        getServer().getPluginManager().registerEvents(new PhantomDodge(this),this);
+        getServer().getPluginManager().registerEvents(new WitherContract(this),this);
+
+        getCommand("gravitygauntlet").setExecutor(new GravityGauntletCommand());
+        getCommand("getwand").setExecutor(new GiveWandCommand());
+
+        LaunchStick launchStick = new LaunchStick(this);
+        getServer().getPluginManager().registerEvents(launchStick,this);
+
         new FireflySimulator(this);
-        registration("FireFlies");
-        //getServer().getPluginManager().registerEvents(new FireflySimulator(this), this);
-        new BukkitRunnable() {
 
+        BlockShop blockShop = new BlockShop(this,economy);
+        blockShop.register();
+
+        new IlluminationWand(this);
+        new BlackholeEffect(this);
+
+        new BukkitRunnable(){
             @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Gravity Gauntlet")) {
-                        ItemStack gauntlet = new ItemStack(Material.NETHERITE_HOE); // You can change this to any item you prefer
-                        ItemMeta meta = gauntlet.getItemMeta();
+            public void run(){
 
-                        if (meta != null) {
-                            meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Gravity Gauntlet");
-                            meta.setLore(Collections.singletonList(ChatColor.GOLD + "Right Click to pull, Shift+Right Click to throw"));
+                for(Player player:Bukkit.getOnlinePlayers()){
+
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Gravity Gauntlet")){
+                        ItemStack item=new ItemStack(Material.NETHERITE_HOE);
+                        ItemMeta meta=item.getItemMeta();
+
+                        if(meta!=null){
+                            meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Gravity Gauntlet");
+                            meta.setLore(Collections.singletonList(
+                                    ChatColor.GOLD+"Right Click to pull, Shift+Right Click to throw"
+                            ));
                             meta.setUnbreakable(true);
-                            gauntlet.setItemMeta(meta);
+                            item.setItemMeta(meta);
                         }
 
-                        player.getInventory().addItem(gauntlet);
+                        player.getInventory().addItem(item);
                     }
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Launch Stick")) {
+
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Wither Skull Cannon")){
+                        player.getInventory().addItem(skullWand.createWand());
+                    }
+
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Seeking Missile Launcher")){
+                        player.getInventory().addItem(missile.getMissileLauncher());
+                    }
+
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Launch Stick")){
                         player.getInventory().addItem(LaunchStick.createLaunchStick());
                     }
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Anchor Shield Kit")) {
-                        giveAnchorKit(player);
-                    }
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Levitation Wand")) {
+
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Levitation Wand")){
                         player.getInventory().addItem(MobLevitationWand.createWand());
                     }
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Rapid Fire Bow")) {
+
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Rapid Fire Bow")){
                         player.getInventory().addItem(RapidFireBow.createRapidFireBow());
                     }
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Illumination Wand")) {
+
+                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Illumination Wand")){
                         player.getInventory().addItem(IlluminationWand.getIlluminationWand());
-                    }
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Mace Of Storms")) {
-                        ItemStack mace = new ItemStack(Material.MACE);
-                        ItemMeta meta = mace.getItemMeta();
-                        meta.setDisplayName(ChatColor.DARK_PURPLE + "Mace of Storms");
-                        mace.setItemMeta(meta);
-                        player.getInventory().addItem(mace);
-                    }
-                    if(removeCustomKnowledgeBook(player,ChatColor.GREEN+"Tracer Bow")) {
-                        ItemStack tb = new ItemStack(Material.BOW);
-                        tb.addUnsafeEnchantment(Enchantment.LOYALTY,1);
-                        player.getInventory().addItem(tb);
                     }
                 }
             }
         }.runTaskTimer(this,0,2);
-        new IlluminationWand(this);
-        registration("Illumination Wand");
-        new BlackholeEffect(this);
-        registration("BlackHole (W.I.P.)");
 
-
-
+        registration("CoswayUtil loaded");
+        serverMessage("&aCoswayUtil enabled.");
     }
 
     private boolean setupEconomy() {

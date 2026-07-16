@@ -1,5 +1,5 @@
 name: CoswayUtil
-version: '1.16.5'
+version: '1.16.6'
 main: CoswayUtil.CoswayUtil
 description: "utility plugin for Cosway servers, a yescraft network server"
 api-version: '1.21'
@@ -89,6 +89,12 @@ commands:
     description: Reload CoswayUtil configuration
     usage: /coswayreload
     permission: coswayutil.reload
+  jail:
+    description: Manually jail a player
+    usage: /jail <player> <fine> <time>
+  unjail:
+    description: Release a player from jail
+    usage: /unjail <player>
 permissions:
   coswayutil.mage:
     default: op
@@ -100,4 +106,8 @@ permissions:
   coswayutil.rename:
     default: op
   coswayutil.reload:
+    default: op
+  coswayutil.jail:
+    default: op
+  coswayutil.unjail:
     default: op
