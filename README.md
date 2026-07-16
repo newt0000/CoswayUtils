@@ -441,14 +441,15 @@ heat-seeking-missile:
       - ENDERMAN
       - WARDEN
       - PLAYER
-      - PIG
-      - HORSE
-      - VILLAGER
-      - CHICKEN
       - BAT
       - WITCH
-      - COW
-      - SHEEP
+      - HUSK
+      - PIGLIN
+      - MAGMA_CUBE
+      - PIGLIN_BRUTE
+      - BOGGED
+      - DROWNED
+      - SQUID
 
   tracking:
     range: 30
