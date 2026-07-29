@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -49,7 +50,10 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
     private Economy economy;
     private FileConfiguration config;
     private WitherSkullWand skullWand;
-
+    private MagmaSmelter magmaSmelter;
+    public MagmaSmelter getMagmaSmelter() {
+        return magmaSmelter;
+    }
     public Economy getEconomy() {
         return economy;
     }
@@ -60,11 +64,66 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-
+        getServer().getPluginManager().registerEvents(this, this);
         saveDefaultConfig();
         config = getConfig();
 
         PDCUtil.init(this);
+        magmaSmelter = new MagmaSmelter(this);
+        magmaSmelter.loadMagmaFurnaces();
+        getServer().getPluginManager().registerEvents(magmaSmelter, this);
+
+        DummyManager dummyManager =
+                new DummyManager(this);
+
+        SkinResolver skinResolver =
+                new SkinResolver(this);
+
+        getCommand("dummy")
+                .setExecutor(
+                        new DummyCommand(
+                                this,
+                                dummyManager,
+                                skinResolver
+                        )
+                );
+        getCommand("equip")
+                .setExecutor(
+                        new EquipCommand(dummyManager)
+                );
+        getServer()
+                .getPluginManager()
+                .registerEvents(
+                        new DummyListener(),
+                        this
+                );
+        DummySettingsCommand dummySettings =
+                new DummySettingsCommand(
+                        this,
+                        dummyManager
+                );
+
+
+        getCommand("dummysettings")
+                .setExecutor(dummySettings);
+
+        getCommand("dummysettings")
+                .setTabCompleter(dummySettings);
+        getServer()
+                .getPluginManager()
+                .registerEvents(
+                        new DummyDamageListener(dummyManager),
+                        this
+                );
+        DummyAIManager dummyAIManager =
+                new DummyAIManager(
+                        this,
+                        dummyManager
+                );
+        registration("Dummy System");
+
+        getServer().getPluginManager().registerEvents(new PlayerFireworkBurst(this), this);
+        registration("Join/Leave particles");
 
         skullWand = new WitherSkullWand(this);
         getServer().getPluginManager().registerEvents(skullWand,this);
@@ -75,7 +134,8 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         getCommand("jail").setExecutor(jail);
         getCommand("unjail").setExecutor(jail);
         registration("Innocent Mob Jail");
-
+        getServer().getPluginManager().registerEvents(new ChatSoundListener(this), this);
+        registration("Chat Sound");
         getCommand("coswaysetpdc").setExecutor(new CoswayPDCCommand());
         getCommand("writecheck").setExecutor(new CheckCommand(this,economy));
         getCommand("cashcheck").setExecutor(new CheckCommand(this,economy));
@@ -147,7 +207,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         }.runTaskTimer(this,0,2);
 
         new GravityGauntlet(this);
-        new TotemShield(this);
+        //new TotemShield(this);
 
         MobLevitationWand levitation = new MobLevitationWand(this);
         getServer().getPluginManager().registerEvents(levitation,this);
@@ -298,6 +358,24 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         }
 
         return true;
+    }
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        Player p = e.getPlayer();
+
+        Bukkit.getLogger().info("Death event fired");
+
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            Location loc = p.getLocation();
+
+            p.sendMessage(ColorKey(
+                    "&c&lYou Died\n" +
+                            "&eWorld: &9" + loc.getWorld().getName() +
+                            "\n&eX: &9" + loc.getBlockX() +
+                            " &eY: &9" + loc.getBlockY() +
+                            " &eZ: &9" + loc.getBlockZ()
+            ));
+        }, 1L);
     }
 
     public String prefix() {

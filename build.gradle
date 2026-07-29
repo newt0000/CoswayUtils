@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.newt-tech'
-version = '1.16.6'
+version = '1.17.1'
 
 repositories {
     mavenCentral()
@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
         exclude group: 'org.bukkit', module: 'bukkit'  // Exclude bukkit dependency
     }

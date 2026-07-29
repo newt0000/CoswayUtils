@@ -95,7 +95,25 @@ commands:
   unjail:
     description: Release a player from jail
     usage: /unjail <player>
+  placemagmafurnace:
+    description: place a magma furnace
+    usage: /placemagmafurnace
+    permission: cosway.place
+  dummy:
+    description: Creates a player skin mannequin
+    usage: /dummy <username|uuid>
+    permission: coswayutil.dummy
+  equip:
+    description: Opens mannequin equipment
+    usage: /equip
+    permission: coswayutil.equip
+  dummysettings:
+    description: Change dummy settings
+    usage: /dummysettings <setting> <value>
+    permission: coswayutil.dummysettings
 permissions:
+  cosway.place:
+    default: op
   coswayutil.mage:
     default: op
   coswayutil.tpp:

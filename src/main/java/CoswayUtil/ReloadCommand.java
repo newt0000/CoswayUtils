@@ -4,10 +4,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import CoswayUtil.MagmaSmelter;
 
 public class ReloadCommand implements CommandExecutor {
 
     private final CoswayUtil plugin;
+
 
     public ReloadCommand(CoswayUtil plugin) {
         this.plugin = plugin;
@@ -36,7 +38,7 @@ public class ReloadCommand implements CommandExecutor {
 
 
         plugin.reloadConfig();
-
+        plugin.getMagmaSmelter().reload();
 
 
         sender.sendMessage(

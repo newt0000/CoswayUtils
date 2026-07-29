@@ -439,3 +439,20 @@ innocents:
     fine: 1000000000
 
     time: 30m
+
+magma-smelter:
+  smelt-delay-ticks: 15
+  output-interval-ticks: 1
+  particle-interval-ticks: 1
+  recipes:
+    molten_iron:
+      input: RAW_IRON_BLOCK
+      output: IRON_BLOCK
+
+    crystal_conversion:
+      input: AMETHYST_BLOCK
+      output: DIAMOND
+
+    bread:
+      input: WHEAT
+      output: BREAD
