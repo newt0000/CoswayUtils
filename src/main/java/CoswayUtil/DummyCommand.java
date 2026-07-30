@@ -97,7 +97,7 @@ public class DummyCommand implements CommandExecutor {
                                                 skin,
                                                 player.getUniqueId()
                                         );
-
+                                mannequin.setDescription(null);
 
                                 if (mannequin != null) {
 
