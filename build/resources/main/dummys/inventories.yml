@@ -1,0 +1,9 @@
+dummies:
+  7f5b2d3e-xxxx-xxxx:
+    contents:
+      "0":
+        ==: org.bukkit.inventory.ItemStack
+        type: DIAMOND_SWORD
+      "1":
+        ==: org.bukkit.inventory.ItemStack
+        type: APPLE

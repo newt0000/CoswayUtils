@@ -72,9 +72,44 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
         magmaSmelter = new MagmaSmelter(this);
         magmaSmelter.loadMagmaFurnaces();
         getServer().getPluginManager().registerEvents(magmaSmelter, this);
-
         DummyManager dummyManager =
                 new DummyManager(this);
+        DummyInventoryManager dummyInventoryManager =
+                new DummyInventoryManager(this);
+        getServer()
+                .getPluginManager()
+                .registerEvents(
+                        new DummyDamageListener(dummyManager),
+                        this
+                );
+        DummyAIManager dummyAIManager =
+                new DummyAIManager(
+                        this,
+                        dummyManager
+                );
+        getServer().getPluginManager().registerEvents(
+                new DummyInventoryListener(
+                        dummyManager,
+                        dummyInventoryManager
+                ),
+                this
+        );
+        getServer().getPluginManager().registerEvents(
+                new DummyInventoryListener(
+                        dummyManager,
+                        dummyInventoryManager
+                ),
+                this
+        );
+
+
+        getServer().getPluginManager().registerEvents(
+                new DummyInventoryCloseListener(
+                        dummyInventoryManager
+                ),
+                this
+        );
+
 
         SkinResolver skinResolver =
                 new SkinResolver(this);
@@ -109,17 +144,7 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
 
         getCommand("dummysettings")
                 .setTabCompleter(dummySettings);
-        getServer()
-                .getPluginManager()
-                .registerEvents(
-                        new DummyDamageListener(dummyManager),
-                        this
-                );
-        DummyAIManager dummyAIManager =
-                new DummyAIManager(
-                        this,
-                        dummyManager
-                );
+
         registration("Dummy System");
 
         getServer().getPluginManager().registerEvents(new PlayerFireworkBurst(this), this);

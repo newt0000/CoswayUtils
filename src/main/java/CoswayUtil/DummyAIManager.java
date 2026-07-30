@@ -109,6 +109,7 @@ public class DummyAIManager {
             return;
         }
 
+
         String uuid = mannequin.getPersistentDataContainer().get(
                 followTargetKey,
                 PersistentDataType.STRING
@@ -118,6 +119,7 @@ public class DummyAIManager {
             return;
         }
 
+
         Player target;
 
         try {
@@ -126,61 +128,130 @@ public class DummyAIManager {
             return;
         }
 
+
         if (target == null || !target.isOnline()) {
             mannequin.setVelocity(new Vector());
             return;
         }
+
 
         if (!target.getWorld().equals(mannequin.getWorld())) {
             mannequin.setVelocity(new Vector());
             return;
         }
 
+
         Location dummyLoc = mannequin.getLocation();
         Location targetLoc = target.getLocation();
 
+
         double distance = dummyLoc.distance(targetLoc);
 
-        // Ignore targets too far away
+
         if (distance > 64.0) {
             mannequin.setVelocity(new Vector());
             return;
         }
 
-        // Face the target
-        Vector direction = targetLoc.toVector().subtract(dummyLoc.toVector());
+
+
+        Vector direction = targetLoc.toVector()
+                .subtract(dummyLoc.toVector());
+
         direction.setY(0);
 
-        if (direction.lengthSquared() > 0.0001) {
-            direction.normalize();
 
-            Location facing = dummyLoc.clone();
-            facing.setDirection(direction);
-            mannequin.teleport(facing);
-        }
 
-        // Stop within 3 blocks
-        if (distance <= 3.0) {
-            mannequin.setVelocity(new Vector());
+        if (direction.lengthSquared() <= 0.0001) {
             return;
         }
 
-        // Walking velocity
-        Vector velocity = direction.multiply(0.22);
 
-        // Detect a one-block obstacle ahead
-        Vector forward = direction.clone().normalize().multiply(0.45);
+        direction.normalize();
 
-        Location feet = mannequin.getLocation();
-        Location ahead = feet.clone().add(forward);
-        Location aboveAhead = ahead.clone().add(0, 1, 0);
 
-        boolean obstacle = ahead.getBlock().getType().isSolid();
-        boolean headRoom = !aboveAhead.getBlock().getType().isSolid();
 
-        if (obstacle && headRoom && mannequin.isOnGround()) {
-            velocity.setY(0.42); // Vanilla jump height
+        // Rotate only - DO NOT TELEPORT
+        mannequin.setRotation(
+                dummyLoc.clone()
+                        .setDirection(direction)
+                        .getYaw(),
+                dummyLoc.getPitch()
+        );
+
+
+
+        // Stop near player but preserve gravity
+        if (distance <= 3.0) {
+
+            Vector current = mannequin.getVelocity();
+
+            mannequin.setVelocity(
+                    new Vector(
+                            0,
+                            current.getY(),
+                            0
+                    )
+            );
+
+            return;
         }
+
+
+
+        Vector velocity = direction.clone()
+                .multiply(0.22);
+
+
+
+        // Preserve gravity
+        velocity.setY(
+                mannequin.getVelocity().getY()
+        );
+
+
+
+        /*
+         * Jump detection
+         */
+
+        Location ahead = mannequin.getLocation()
+                .clone()
+                .add(
+                        direction.clone()
+                                .multiply(0.5)
+                );
+
+
+        boolean blockAhead =
+                ahead.getBlock()
+                        .getType()
+                        .isSolid();
+
+
+        boolean spaceAbove =
+                !ahead.clone()
+                        .add(0,1,0)
+                        .getBlock()
+                        .getType()
+                        .isSolid()
+                        &&
+                        !ahead.clone()
+                                .add(0,2,0)
+                                .getBlock()
+                                .getType()
+                                .isSolid();
+
+
+
+        if (blockAhead
+                && spaceAbove
+                && mannequin.isOnGround()) {
+
+            velocity.setY(0.42);
+        }
+
+
 
         mannequin.setVelocity(velocity);
     }
@@ -232,7 +303,10 @@ public class DummyAIManager {
 
         loc.setDirection(direction);
 
-        mannequin.teleport(loc);
+        mannequin.setRotation(
+                loc.getYaw(),
+                loc.getPitch()
+        );
     }
 
 }
