@@ -129,7 +129,7 @@ public class DummySettingsCommand implements CommandExecutor, TabCompleter {
             case "customname" -> {
 
                 dummy.customName(
-                        net.kyori.adventure.text.Component.text(value)
+                        net.kyori.adventure.text.Component.text(plugin.ColorKey(value))
                 );
             }
 
