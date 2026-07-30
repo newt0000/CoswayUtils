@@ -93,7 +93,19 @@ public class DummyInventoryManager {
     }
 
 
+    public void clearInventory(Mannequin mannequin) {
 
+        String path =
+                "dummies."
+                        + mannequin.getUniqueId()
+                        + ".contents";
+
+
+        config.set(path, null);
+
+
+        save();
+    }
     public void saveInventory(
             Mannequin mannequin,
             Inventory inventory

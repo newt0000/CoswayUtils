@@ -110,7 +110,13 @@ public final class CoswayUtil extends JavaPlugin implements Listener {
                 this
         );
 
-
+        getServer().getPluginManager().registerEvents(
+                new DummyDeathListener(
+                        dummyManager,
+                        dummyInventoryManager
+                ),
+                this
+        );
         SkinResolver skinResolver =
                 new SkinResolver(this);
 
